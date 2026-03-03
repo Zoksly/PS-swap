@@ -21,42 +21,41 @@ int	find_chunk_in_stack(t_sta *tab, int *sorted_array, int chk_targ, int chk_sz)
 	int		i_node;
 	t_list	*stack;
 
-	stack = tab -> stack_a;
+	stack = tab->stack_a;
 	chunk_start = chk_sz * chk_targ;
 	chunk_end = chunk_start + chk_sz - 1;
 	i_node = 0;
 	while (stack)
 	{
-		index = get_index(stack, sorted_array, tab -> lena);
+		index = get_index(stack, sorted_array, tab->lena + tab->lenb);
 		if (index >= chunk_start && index <= chunk_end)
 			return (i_node);
-		stack = stack -> next;
+		stack = stack->next;
 		i_node++;
 	}
 	return (-1);
 }
 
 //push stack_a to tack_b, in chunks
-void	push_chunk(t_sta *tab, int nb_node, int *array, int chunk_size)
+void push_chunk(t_sta *tab, int nb_node, int *array, int chunk_size)
 {
-	int	i_chunks;
-	int	n_index;
+    int i_chunks;
+    int n_index;
 
-	i_chunks = 0;
-	while (i_chunks <= nb_node / chunk_size)
-	{
-		while (find_chunk_in_stack(tab, array, i_chunks, chunk_size) != -1)
-		{
-			n_index = find_chunk_in_stack(tab, array, i_chunks, chunk_size);
-			if (n_index == 0)
-				pb(tab, &tab -> stack_a, &tab -> stack_b);
-			else if (n_index <= (int)tab -> lena / 2)
-				ra(tab, &tab -> stack_a);
-			else
-				rra(tab, &tab -> stack_a);
-		}
-		i_chunks++;
-	}
+    i_chunks = 0;
+    while (i_chunks <= nb_node / chunk_size)
+    {
+        while ((n_index = find_chunk_in_stack(tab, array, i_chunks, chunk_size)) != -1)
+        {
+            if (n_index == 0)
+                pb(tab, &tab -> stack_a, &tab -> stack_b);
+            else if (n_index <= (int)tab -> lena / 2)
+                ra(tab, &tab -> stack_a);
+            else
+                rra(tab, &tab -> stack_a);
+        }
+        i_chunks++;
+    }
 }
 
 void	ft_medium(t_sta *tab, int nb_node)

@@ -6,7 +6,7 @@
 /*   By: vblanco- <vblanco-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/03 18:58:33 by vblanco-          #+#    #+#             */
-/*   Updated: 2026/03/03 19:11:52 by vblanco-         ###   ########.fr       */
+/*   Updated: 2026/03/03 23:14:37 by vblanco-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,21 +23,12 @@ void	ft_choose_algo(t_sta *tab)
 		sa(tab, &tab -> stack_a);
 	else if (((float)tab -> disorder < 0.2 && (float)tab -> disorder > 0)
 		|| tab -> mode == 1)
-	{
 		ft_simple(tab);
-		tab -> mode = 1;
-	}
 	else if (((float)tab -> disorder >= 0.2 && (float)tab -> disorder < 0.5)
 		|| (tab -> mode == 2))
-	{
 		ft_medium(tab, tab -> lena);
-		tab -> mode = 2;
-	}
 	else if (((float)tab -> disorder >= 0.5) || (tab -> mode == 3))
-	{
 		radix_sort(tab);
-		tab -> mode = 3;
-	}
 	if (tab -> benchm == 1)
 		get_benchmark(tab);
 }

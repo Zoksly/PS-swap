@@ -1,0 +1,4 @@
+trier les nombres en chunks 
+
+ex :
+tous les chiffres de 0 à 9 dans le chunk 1

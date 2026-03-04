@@ -40,21 +40,16 @@ void	ft_simple(t_sta *tab)
 {
 	t_list	*stacka;
 	t_list	*stackb;
-	int		i;
 	int		j;
 
 	stacka = tab -> stack_a;
 	stackb = tab -> stack_b;
-	i = tab -> lena;
 	while (stacka)
 	{
 		j = get_min_index(stacka);
 		if (j == 0)
-		{
 			pb(tab, &stacka, &stackb);
-			i--;
-		}
-		else if (j < i / 2)
+		else if (j < (int)tab -> lena / 2)
 			ra(tab, &stacka);
 		else
 			rra(tab, &stacka);

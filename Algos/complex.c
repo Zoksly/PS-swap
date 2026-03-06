@@ -77,6 +77,8 @@ void	radix_sort(t_sta *tab)
 	int	max_bits;
 
 	array = stack_to_array(tab -> stack_a, tab -> lena, 1);
+	if (!array)
+		return ;
 	i_bits = 0;
 	max_bits = get_max_bits(tab -> lena, array);
 	while (i_bits < max_bits)

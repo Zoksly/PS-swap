@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparaison Push_swap v10.0 vs v1.1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.7; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #58a6ff; font-size: 2.2em; margin: 30px 0 10px; }
+        .subtitle { text-align: center; color: #8b949e; margin-bottom: 30px; font-size: 1.1em; }
+        h2 { color: #58a6ff; margin: 35px 0 15px; font-size: 1.5em; border-left: 4px solid #58a6ff; padding-left: 12px; }
+        h3 { color: #79c0ff; margin: 15px 0 8px; font-size: 1.15em; }
+
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin: 15px 0; }
+        .same { border-left: 4px solid #3fb950; }
+        .changed { border-left: 4px solid #d29922; }
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78em; font-weight: bold; margin-right: 6px; vertical-align: middle; }
+        .badge-same { background: #238636; color: #fff; }
+        .badge-chg { background: #9e6a03; color: #fff; }
+        .badge-v10 { background: #6e40c9; color: #fff; }
+        .badge-v11 { background: #1f6feb; color: #fff; }
+
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px 14px; text-align: left; border: 1px solid #30363d; }
+        th { background: #21262d; color: #58a6ff; font-weight: 600; }
+        tr:nth-child(even) { background: #161b22; }
+        tr:nth-child(odd) { background: #0d1117; }
+
+        code { background: #21262d; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; color: #f0883e; font-size: 0.9em; }
+
+        .verdict { background: linear-gradient(135deg, #0f1a0f, #162416); border: 2px solid #3fb950; border-radius: 10px; padding: 30px; margin: 30px 0; text-align: center; }
+        .verdict h2 { border: none; text-align: center; color: #3fb950; font-size: 1.8em; }
+        .verdict p { font-size: 1.1em; margin-top: 10px; }
+
+        .summary-box { background: linear-gradient(135deg, #161b22, #1c2333); border: 1px solid #30363d; border-radius: 10px; padding: 25px; margin: 25px 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Push_swap : v10.0 vs v1.1</h1>
+    <p class="subtitle">Comparaison des deux sujets</p>
+
+    <!-- ==================== VERDICT ==================== -->
+    <div class="verdict">
+        <h2>Les deux sujets sont quasi identiques</h2>
+        <p>La v1.1 est un <strong>renommage</strong> de la v10.0. Le contenu technique est le meme.</p>
+        <p style="color:#8b949e; margin-top:5px;">Seules des differences cosmetiques de formulation existent.</p>
+    </div>
+
+    <!-- ==================== RESUME ==================== -->
+    <h2>Differences trouvees</h2>
+
+    <div class="card changed">
+        <h3><span class="badge badge-chg">COSMETIQUE</span> Page de garde - Summary</h3>
+        <table>
+            <tr><th>Element</th><th><span class="badge badge-v10">v10.0</span></th><th><span class="badge badge-v11">v1.1</span></th></tr>
+            <tr>
+                <td>Version</td>
+                <td>Version: 10.0</td>
+                <td>Version: 1.1</td>
+            </tr>
+            <tr>
+                <td>Terme utilise</td>
+                <td><em>"In this project, you will sort data..."</em></td>
+                <td><em>"This activity will make you sort data..."</em></td>
+            </tr>
+            <tr>
+                <td>Groupe</td>
+                <td><em>"This is a group project to be completed by exactly two learners"</em></td>
+                <td><em>"This is a group activity to be completed by exactly 2 learners."</em></td>
+            </tr>
+        </table>
+        <p style="margin-top:10px; color:#8b949e;">Difference purement redactionnelle. "project" vs "activity", "two" vs "2". Meme exigence.</p>
+    </div>
+
+    <div class="card changed">
+        <h3><span class="badge badge-chg">COSMETIQUE</span> Introduction (Chapter IV)</h3>
+        <table>
+            <tr><th><span class="badge badge-v10">v10.0</span></th><th><span class="badge badge-v11">v1.1</span></th></tr>
+            <tr>
+                <td><em>"The Push swap project is a simple yet highly structured algorithmic challenge: you need to sort data."</em></td>
+                <td><em>"The Push swap project is a very simple and highly straightforward algorithm project: data must be sorted."</em></td>
+            </tr>
+            <tr>
+                <td><em>"...calculates and displays the shortest sequence of Push_swap instructions needed to sort the given integers."</em></td>
+                <td><em>"...which calculates and displays on the standard output the smallest program, made of Push swap language operations, that sorts the integers received as arguments."</em></td>
+            </tr>
+        </table>
+        <p style="margin-top:10px; color:#8b949e;">Reformulation. Meme sens.</p>
+    </div>
+
+    <div class="card changed">
+        <h3><span class="badge badge-chg">COSMETIQUE</span> VI.2 - The rules - formulation mineure</h3>
+        <table>
+            <tr><th><span class="badge badge-v10">v10.0</span></th><th><span class="badge badge-v11">v1.1</span></th></tr>
+            <tr>
+                <td><em>"a random number of unique negative and/or positive integers"</em></td>
+                <td><em>"a random amount of negative and/or positive numbers without any duplicate"</em></td>
+            </tr>
+            <tr>
+                <td><em>"Shift up all elements of stack a by 1."</em></td>
+                <td><em>"Shift up all elements of stack a by one."</em></td>
+            </tr>
+        </table>
+        <p style="margin-top:10px; color:#8b949e;">"1" vs "one", "unique integers" vs "numbers without duplicate". Meme sens.</p>
+    </div>
+
+    <div class="card changed">
+        <h3><span class="badge badge-chg">COSMETIQUE</span> VI.3.3 - Required strategies - Adaptive, regime Low disorder</h3>
+        <table>
+            <tr><th><span class="badge badge-v10">v10.0</span></th><th><span class="badge badge-v11">v1.1</span></th></tr>
+            <tr>
+                <td>Low disorder: <em>"must run in <strong>O(n)</strong> time"</em></td>
+                <td>Low disorder: <em>"must run in <strong>O(n2)</strong> time"</em></td>
+            </tr>
+        </table>
+        <p style="margin-top:15px; color:#d29922; font-weight: bold; font-size: 1.05em;">C'est la SEULE difference technique entre les deux sujets !</p>
+        <p style="margin-top:5px;">La v10.0 exigeait O(n) pour disorder &lt; 0.2, la v1.1 demande seulement O(n2). C'est un assouplissement significatif.</p>
+    </div>
+
+    <!-- ==================== CE QUI EST IDENTIQUE ==================== -->
+    <h2>Tout le reste est identique</h2>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> Structure des chapitres</h3>
+        <p>Meme table des matieres, memes sections, meme ordre :</p>
+        <p style="color:#8b949e;">I. Foreword (Big-O) | II. Common Instructions | III. AI Instructions | IV. Introduction | V. Objectives | VI. Mandatory part (VI.1-VI.6) | VII. Readme | VIII. Bonus | IX. Submission</p>
+    </div>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> Projet de groupe</h3>
+        <ul>
+            <li>2 learners obligatoires</li>
+            <li>Contributions dans le README</li>
+            <li>Les 2 presents a la defense</li>
+        </ul>
+    </div>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> 4 algorithmes obligatoires</h3>
+        <table>
+            <tr><th>Strategie</th><th>Complexite</th><th>Exemples</th></tr>
+            <tr><td>Simple</td><td>O(n2)</td><td>Insertion sort, selection sort, bubble sort</td></tr>
+            <tr><td>Medium</td><td>O(n * sqrt(n))</td><td>Chunk-based, block-based, bucket sort</td></tr>
+            <tr><td>Complex</td><td>O(n log n)</td><td>Radix sort, merge sort, quick sort, heap sort</td></tr>
+            <tr><td>Adaptive</td><td>Variable selon disorder</td><td>Choix automatique</td></tr>
+        </table>
+    </div>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> Disorder metric obligatoire</h3>
+        <p>Meme pseudocode, meme formule : <code>mistakes / total_pairs</code></p>
+        <p>Mesure obligatoire avant tout mouvement.</p>
+    </div>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> Contraintes de complexite par regime (sauf Low)</h3>
+        <table>
+            <tr><th>Regime</th><th><span class="badge badge-v10">v10.0</span></th><th><span class="badge badge-v11">v1.1</span></th></tr>
+            <tr><td style="color:#3fb950;">Low disorder (&lt; 0.2)</td><td style="color:#f0883e;">O(n)</td><td style="color:#3fb950;">O(n2)</td></tr>
+            <tr><td style="color:#d29922;">Medium (0.2 &le; d &lt; 0.5)</td><td>O(n * sqrt(n))</td><td>O(n * sqrt(n))</td></tr>
+            <tr><td style="color:#f85149;">High (&ge; 0.5)</td><td>O(n log n)</td><td>O(n log n)</td></tr>
+        </table>
+    </div>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> Flags et --bench</h3>
+        <ul>
+            <li><code>--simple</code>, <code>--medium</code>, <code>--complex</code>, <code>--adaptive</code> obligatoires</li>
+            <li><code>--bench</code> obligatoire avec disorder%, strategie, total ops, detail par operation</li>
+            <li>Benchmark sur stderr</li>
+        </ul>
+    </div>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> Benchmarks de performance</h3>
+        <table>
+            <tr><th>Taille</th><th>Minimum</th><th>Bon</th><th>Excellent</th></tr>
+            <tr><td>100 nombres</td><td>&lt; 2000</td><td>&lt; 1500</td><td>&lt; 700</td></tr>
+            <tr><td>500 nombres</td><td>&lt; 12000</td><td>&lt; 8000</td><td>&lt; 5500</td></tr>
+        </table>
+    </div>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> Tout le reste</h3>
+        <ul>
+            <li>11 operations (sa, sb, ss, pa, pb, ra, rb, rr, rra, rrb, rrr)</li>
+            <li>Gestion d'erreurs : <code>"Error\n"</code> sur stderr</li>
+            <li>Sans args : rien afficher</li>
+            <li>Makefile : <code>$(NAME)</code>, <code>all</code>, <code>clean</code>, <code>fclean</code>, <code>re</code></li>
+            <li><code>-Wall -Wextra -Werror</code></li>
+            <li>Pas de variables globales</li>
+            <li>Libft autorisee</li>
+            <li>README avec justification des algorithmes</li>
+            <li>Bonus checker identique</li>
+            <li>Exemples d'utilisation identiques</li>
+        </ul>
+    </div>
+
+    <!-- ==================== IMPACT ==================== -->
+    <h2>Impact sur ton projet</h2>
+
+    <div class="summary-box">
+        <h3 style="color:#3fb950;">Bonne nouvelle</h3>
+        <p style="margin-top:10px;">La v1.1 demande <strong>O(n2)</strong> au lieu de O(n) pour le disorder &lt; 0.2. Ton <strong>Selection Sort</strong> (qui est O(n2)) est donc <strong>conforme</strong> pour le regime low disorder.</p>
+        <p style="margin-top:15px;">En resume, si tu es sur la <strong>v1.1</strong> :</p>
+        <table>
+            <tr><th>Exigence</th><th>Ton code</th><th>Statut</th></tr>
+            <tr><td>4 algorithmes distincts</td><td>Simple (Selection), Medium (Chunk), Complex (Radix), Adaptive + Turk</td><td style="color:#3fb950;">OK</td></tr>
+            <tr><td>Disorder metric</td><td><code>ft_compute_disorder()</code></td><td style="color:#3fb950;">OK</td></tr>
+            <tr><td>Flags --simple/--medium/--complex/--adaptive</td><td>Implementes dans <code>ft_parse_mode</code></td><td style="color:#3fb950;">OK</td></tr>
+            <tr><td>Mode --bench</td><td><code>get_benchmark()</code> sur stderr</td><td style="color:#3fb950;">OK</td></tr>
+            <tr><td>Low disorder &lt;0.2 en O(n2)</td><td>Selection sort = O(n2)</td><td style="color:#3fb950;">OK</td></tr>
+            <tr><td>Medium disorder en O(n*sqrt(n))</td><td>Chunk sort</td><td style="color:#3fb950;">OK</td></tr>
+            <tr><td>High disorder en O(n log n)</td><td>Radix sort</td><td style="color:#3fb950;">OK</td></tr>
+            <tr><td>Groupe (2 learners)</td><td>?</td><td style="color:#d29922;">A verifier</td></tr>
+            <tr><td>README + justification algos</td><td>Absent</td><td style="color:#f85149;">MANQUANT</td></tr>
+            <tr><td>Benchmark 100 &lt;2000 (min)</td><td>~1484 (adaptatif)</td><td style="color:#3fb950;">OK</td></tr>
+            <tr><td>Benchmark 500 &lt;12000 (min)</td><td>~7791 (adaptatif)</td><td style="color:#3fb950;">OK</td></tr>
+            <tr><td>Benchmark 100 &lt;700 (excellent)</td><td>~1484</td><td style="color:#f85149;">NON</td></tr>
+            <tr><td>Benchmark 500 &lt;5500 (excellent)</td><td>~7791</td><td style="color:#f85149;">NON</td></tr>
+        </table>
+        <p style="margin-top:15px; color:#d29922;">Le bench format dans ton <code>--bench</code> devrait aussi afficher le disorder en <strong>% avec 2 decimales</strong> et le <strong>nom de la strategie + sa complexite</strong>. Verifie que ton output match le format attendu.</p>
+    </div>
+
+</div>
+</body>
+</html>

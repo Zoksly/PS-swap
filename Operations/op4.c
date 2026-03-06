@@ -12,12 +12,12 @@
 
 #include "push_swap.h"
 
-static void	ft_rr(t_sta *tab, t_list **stack1)
+static void	ft_rr(t_list **stack1)
 {
 	t_list	*temp;
 	t_list	*last;
 
-	if (!(stack1) && !((*stack1)->next))
+	if (!(stack1) || !(*stack1) || !((*stack1)->next))
 		return ;
 	temp = *stack1;
 	while ((temp -> next -> next))
@@ -26,27 +26,29 @@ static void	ft_rr(t_sta *tab, t_list **stack1)
 	temp -> next = NULL;
 	last -> next = *stack1;
 	*stack1 = last;
-	tab -> ops.total += 1;
 }
 
 void	rra(t_sta *tab, t_list **stacka)
 {
-	ft_rr(tab, stacka);
+	ft_rr(stacka);
 	tab -> ops.rra += 1;
+	tab -> ops.total += 1;
 	write(1, "rra\n", 4);
 }
 
 void	rrb(t_sta *tab, t_list **stackb)
 {
-	ft_rr(tab, stackb);
+	ft_rr(stackb);
 	tab -> ops.rrb += 1;
+	tab -> ops.total += 1;
 	write(1, "rrb\n", 4);
 }
 
 void	rrr(t_sta *tab, t_list **stacka, t_list **stackb)
 {
-	ft_rr(tab, stacka);
-	ft_rr(tab, stackb);
+	ft_rr(stacka);
+	ft_rr(stackb);
 	tab -> ops.rrr += 1;
+	tab -> ops.total += 1;
 	write(1, "rrr\n", 4);
 }

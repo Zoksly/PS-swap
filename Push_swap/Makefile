@@ -1,4 +1,4 @@
-NAME = push_swap.a
+NAME = push_swap
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
@@ -18,7 +18,10 @@ SRCS = main.c \
 	../Algos/medium.c \
 	../Algos/complex.c \
 	../Algos/helpers.c \
-	../Algos/hardcodes.c \
+	../Algos/small_sorters.c \
+	../Algos/Turk/turk.c \
+	../Algos/Turk/costs.c \
+	../Algos/Turk/helps.c \
 	$(DPRINTF_DIR)/ft_dprintf.c \
 	$(DPRINTF_DIR)/ft_putchar.c \
 	$(DPRINTF_DIR)/ft_putstr.c \

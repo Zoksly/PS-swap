@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimisations Radix Sort - Push_swap</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.7; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #58a6ff; font-size: 2.2em; margin: 30px 0 10px; }
+        .subtitle { text-align: center; color: #8b949e; margin-bottom: 30px; font-size: 1.05em; }
+        h2 { color: #58a6ff; margin: 35px 0 15px; font-size: 1.5em; border-left: 4px solid #58a6ff; padding-left: 12px; }
+        h3 { color: #79c0ff; margin: 15px 0 8px; font-size: 1.15em; }
+        h4 { color: #d2a8ff; margin: 12px 0 6px; font-size: 1.02em; }
+
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin: 15px 0; }
+        .idea { border-left: 4px solid #58a6ff; }
+        .concept { border-left: 4px solid #d2a8ff; }
+        .warning { border-left: 4px solid #d29922; }
+        .impact-high { border-left: 4px solid #3fb950; }
+        .impact-med { border-left: 4px solid #d29922; }
+        .impact-low { border-left: 4px solid #f85149; }
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78em; font-weight: bold; margin-right: 6px; vertical-align: middle; }
+        .badge-high { background: #238636; color: #fff; }
+        .badge-med { background: #9e6a03; color: #fff; }
+        .badge-low { background: #6e40c9; color: #fff; }
+        .badge-concept { background: #1f6feb; color: #fff; }
+
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px 14px; text-align: left; border: 1px solid #30363d; }
+        th { background: #21262d; color: #58a6ff; font-weight: 600; }
+        tr:nth-child(even) { background: #161b22; }
+        tr:nth-child(odd) { background: #0d1117; }
+
+        code { background: #21262d; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; color: #f0883e; font-size: 0.9em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 15px; overflow-x: auto; margin: 10px 0; }
+        pre code { background: none; padding: 0; color: #c9d1d9; }
+
+        .diagram { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin: 15px 0; font-family: 'Consolas', monospace; font-size: 0.9em; line-height: 1.5; white-space: pre; overflow-x: auto; }
+        .diagram .comment { color: #8b949e; }
+        .diagram .highlight { color: #3fb950; font-weight: bold; }
+        .diagram .op { color: #f0883e; }
+        .diagram .label { color: #58a6ff; }
+
+        .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 768px) { .compare { grid-template-columns: 1fr; } }
+        .before { background: #1a0a0a; border: 1px solid #f85149; border-radius: 8px; padding: 18px; }
+        .after { background: #0a1a0a; border: 1px solid #3fb950; border-radius: 8px; padding: 18px; }
+        .before h4 { color: #f85149; }
+        .after h4 { color: #3fb950; }
+
+        .meter { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+        .meter-bar { flex: 1; height: 20px; background: #21262d; border-radius: 4px; overflow: hidden; }
+        .meter-fill { height: 100%; border-radius: 4px; }
+        .meter-label { min-width: 100px; font-size: 0.85em; color: #8b949e; }
+        .meter-value { min-width: 80px; text-align: right; font-weight: bold; font-size: 0.9em; }
+
+        .summary-box { background: linear-gradient(135deg, #161b22, #1c2333); border: 2px solid #58a6ff; border-radius: 10px; padding: 25px; margin: 25px 0; }
+
+        .step { counter-increment: step-counter; padding-left: 40px; position: relative; margin: 15px 0; }
+        .step::before { content: counter(step-counter); position: absolute; left: 0; top: 0; background: #58a6ff; color: #0d1117; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; }
+        .steps { counter-reset: step-counter; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Optimisations du Radix Sort</h1>
+    <p class="subtitle">Pistes d'amelioration sans code tout fait -- complexite maintenue en O(n log n)</p>
+
+    <!-- ==================== CONTEXTE ==================== -->
+    <h2>Contexte actuel</h2>
+
+    <div class="card concept">
+        <h3>Comment fonctionne ton radix actuel</h3>
+        <p>Ton radix LSD (Least Significant Bit) fonctionne ainsi :</p>
+        <div class="steps">
+            <div class="step">Copier la stack dans un tableau trie pour obtenir les <strong>index</strong> de chaque element (0 a n-1)</div>
+            <div class="step">Pour chaque bit (du bit 0 au bit max) :</div>
+            <div class="step">Parcourir les n elements : si le bit de l'index est <strong>0</strong> → <code>pb</code>, si le bit est <strong>1</strong> → <code>ra</code></div>
+            <div class="step">Apres chaque passe : tout <code>pa</code> depuis b vers a</div>
+        </div>
+
+        <h3 style="margin-top:20px;">Cout actuel</h3>
+        <p>Pour <strong>100 nombres</strong> : les index vont de 0 a 99, donc max 7 bits.</p>
+        <p>A chaque passe de bit : <strong>n</strong> operations (ra ou pb) + nombre de pb operations (pa pour tout ramener).</p>
+        <p>Cout total approximatif : <strong>n * nb_bits + total_pa</strong> ≈ 100 * 7 + ~350 ≈ <strong>~1050-1600 ops</strong></p>
+    </div>
+
+    <!-- ==================== OPTIMISATION 1 ==================== -->
+    <h2>Piste 1 : Skipper les passes inutiles</h2>
+
+    <div class="card impact-high">
+        <h3><span class="badge badge-high">IMPACT ELEVE</span> Sauter une passe quand un bit est uniforme</h3>
+
+        <p>Si pour un bit donne, <strong>tous</strong> les elements ont la meme valeur de bit (tous 0 ou tous 1), cette passe ne fait que des <code>ra</code> ou que des <code>pb</code> suivis de <code>pa</code> -- elle ne change rien a l'ordre.</p>
+
+        <h4>Principe</h4>
+        <p>Avant de lancer la passe pour le bit <code>i</code>, compter combien d'elements ont ce bit a 0 et combien a 1. Si l'un des deux est <strong>0</strong>, skipper toute la passe.</p>
+
+        <div class="compare">
+            <div class="before">
+                <h4>Sans optimisation</h4>
+                <p>100 elements, 7 bits → <strong>7 passes</strong></p>
+                <p>Meme si le bit 6 est a 1 pour tous les elements (tous > 64), on fait quand meme 100 <code>ra</code> pour rien.</p>
+            </div>
+            <div class="after">
+                <h4>Avec optimisation</h4>
+                <p>On detecte que le bit 6 est uniforme → <strong>skip</strong></p>
+                <p>6 passes au lieu de 7 → economie de ~100-200 ops</p>
+            </div>
+        </div>
+
+        <h4>Gain estime</h4>
+        <div class="meter">
+            <div class="meter-label">100 nombres</div>
+            <div class="meter-bar"><div class="meter-fill" style="width:30%; background:#3fb950;"></div></div>
+            <div class="meter-value" style="color:#3fb950;">-100 a -300 ops</div>
+        </div>
+
+        <p style="margin-top:10px; color:#8b949e;">Note : tu as deja la fonction <code>count_bits</code> qui fait ce calcul mais elle n'est pas utilisee pour skipper.</p>
+    </div>
+
+    <!-- ==================== OPTIMISATION 2 ==================== -->
+    <h2>Piste 2 : Trier par le bit majoritaire</h2>
+
+    <div class="card impact-med">
+        <h3><span class="badge badge-med">IMPACT MOYEN</span> Inverser la logique pb/ra selon la majorite</h3>
+
+        <h4>Probleme</h4>
+        <p>Actuellement, bit=0 → <code>pb</code>, bit=1 → <code>ra</code>. Apres la passe, tous les elements pb doivent etre <code>pa</code> pour revenir dans a. Si 70 elements ont le bit a 0, tu fais 70 <code>pb</code> + 70 <code>pa</code> = 140 ops rien que pour les transferts.</p>
+
+        <h4>Principe</h4>
+        <p>Compter la proportion de 0 et de 1 pour le bit courant. Envoyer dans b le <strong>groupe minoritaire</strong> (celui qui a le moins d'elements). Ainsi, le nombre de <code>pb</code> + <code>pa</code> est minimise.</p>
+
+        <div class="diagram"><span class="label">Exemple : bit 3, 100 elements</span>
+
+<span class="comment">Cas 1 : 70 elements ont bit=0, 30 ont bit=1</span>
+
+<span class="highlight">Logique actuelle :</span>  pb les 70 (bit=0), ra les 30 → 70 pb + 30 ra + 70 pa = <span class="op">170 ops</span>
+<span class="highlight">Logique inversee :</span> pb les 30 (bit=1), ra les 70 → 30 pb + 70 ra + 30 pa = <span class="op">130 ops</span>
+
+<span class="comment">Economie : 40 ops sur cette seule passe</span></div>
+
+        <h4>Attention</h4>
+        <p>Quand tu inverses la logique (pb les 1 au lieu des 0), l'ordre de reconstruction change. Il faut reflechir a comment les elements reviennent dans a pour que le tri reste correct. Deux approches :</p>
+        <ul style="margin-top:8px;">
+            <li>Toujours remettre les elements de b <strong>au meme endroit relatif</strong> dans a (en utilisant des <code>pa</code> au bon moment)</li>
+            <li>Alterner la direction de tri entre les passes (comme un radix LSD bidirectionnel)</li>
+        </ul>
+
+        <h4>Gain estime</h4>
+        <div class="meter">
+            <div class="meter-label">100 nombres</div>
+            <div class="meter-bar"><div class="meter-fill" style="width:25%; background:#d29922;"></div></div>
+            <div class="meter-value" style="color:#d29922;">-100 a -200 ops</div>
+        </div>
+    </div>
+
+    <!-- ==================== OPTIMISATION 3 ==================== -->
+    <h2>Piste 3 : Ne pas tout ramener apres chaque passe</h2>
+
+    <div class="card impact-high">
+        <h3><span class="badge badge-high">IMPACT ELEVE</span> Alterner le sens du tri entre les passes (ping-pong)</h3>
+
+        <h4>Probleme</h4>
+        <p>Apres chaque passe, tu fais des <code>pa</code> pour ramener tout de b vers a. Ces <code>pa</code> representent environ <strong>30-50% des ops totales</strong>.</p>
+
+        <h4>Principe</h4>
+        <p>Au lieu de toujours trier depuis a, alterner :</p>
+
+        <div class="diagram"><span class="label">Radix classique :</span>
+Passe bit 0 : a → split → b contient les 0, a les 1 → <span class="op">pa tout</span> → tout dans a
+Passe bit 1 : a → split → b contient les 0, a les 1 → <span class="op">pa tout</span> → tout dans a
+Passe bit 2 : a → split → ...
+
+<span class="label">Radix ping-pong :</span>
+Passe bit 0 : a → split → b contient les 0, a les 1 → <span class="highlight">on laisse comme ca</span>
+Passe bit 1 : on trie <span class="highlight">depuis les deux stacks</span> → on redistribue
+Passe bit 2 : ...</div>
+
+        <p>L'idee est de travailler avec les elements la ou ils sont, sans les deplacer inutilement. C'est plus complexe a implementer car il faut gerer les deux stacks simultanement.</p>
+
+        <h4>Variante simplifiee</h4>
+        <p>Alterner le "sens" : passe impaire trie de a vers b, passe paire trie de b vers a. Ainsi, les <code>pa</code> de reconstruction d'une passe deviennent les <code>pb</code> de tri de la passe suivante -- ils ne sont plus "gratuits" mais il n'y a plus de phase de reconstruction separee.</p>
+
+        <h4>Gain estime</h4>
+        <div class="meter">
+            <div class="meter-label">100 nombres</div>
+            <div class="meter-bar"><div class="meter-fill" style="width:40%; background:#3fb950;"></div></div>
+            <div class="meter-value" style="color:#3fb950;">-200 a -400 ops</div>
+        </div>
+    </div>
+
+    <!-- ==================== OPTIMISATION 4 ==================== -->
+    <h2>Piste 4 : Utiliser un radix en base plus grande</h2>
+
+    <div class="card impact-med">
+        <h3><span class="badge badge-med">IMPACT MOYEN</span> Radix en base 4 au lieu de base 2</h3>
+
+        <h4>Probleme</h4>
+        <p>En base 2, pour 100 elements tu as 7 passes. Chaque passe coute ~n ops minimum.</p>
+
+        <h4>Principe</h4>
+        <p>En base 4, chaque "digit" encode 2 bits. Tu as besoin de ceil(7/2) = <strong>4 passes</strong> au lieu de 7. Mais chaque passe doit separer les elements en <strong>4 groupes</strong> (digits 0, 1, 2, 3).</p>
+
+        <p>Avec 2 stacks, tu ne peux separer qu'en 2 groupes a la fois. Mais tu peux faire 2 sous-passes :</p>
+
+        <div class="diagram"><span class="label">Base 4, digit courant peut etre 0, 1, 2, ou 3 :</span>
+
+<span class="highlight">Sous-passe A :</span> envoie les digits 0 et 1 dans b (bit de poids fort du digit = 0)
+                    garde les digits 2 et 3 dans a
+
+<span class="highlight">Sous-passe B :</span> dans b, separe les 0 des 1 (ra/pb)
+                    dans a, separe les 2 des 3 (ra/pb)
+
+<span class="comment">Resultat : les 4 groupes sont ordonnes en 2 sous-passes au lieu de 2 passes completes</span></div>
+
+        <h4>Difficulte</h4>
+        <p>La gestion de la reconstruction est plus delicate. Il faut recombiner les 4 groupes dans le bon ordre, ce qui demande une logique plus sophistiquee que le radix binaire.</p>
+
+        <h4>Gain estime</h4>
+        <div class="meter">
+            <div class="meter-label">100 nombres</div>
+            <div class="meter-bar"><div class="meter-fill" style="width:25%; background:#d29922;"></div></div>
+            <div class="meter-value" style="color:#d29922;">-150 a -300 ops</div>
+        </div>
+    </div>
+
+    <!-- ==================== OPTIMISATION 5 ==================== -->
+    <h2>Piste 5 : Pre-tri partiel avant le radix</h2>
+
+    <div class="card impact-med">
+        <h3><span class="badge badge-med">IMPACT MOYEN</span> Reduire le nombre de bits necessaires</h3>
+
+        <h4>Principe</h4>
+        <p>Avant de lancer le radix, faire un pre-tri "grossier" qui place les elements approximativement dans le bon ordre. Si la stack est deja partiellement triee, les bits de poids fort seront uniformes et pourront etre skippes (voir Piste 1).</p>
+
+        <div class="diagram"><span class="label">Exemple avec 100 elements (index 0-99) :</span>
+
+<span class="comment">Sans pre-tri :</span> index melangees, 7 bits necessaires, aucun bit skippable
+
+<span class="comment">Avec pre-tri (push les moities) :</span>
+  1. Push les elements dont l'index &lt; 50 dans b  <span class="comment">(~150 ops)</span>
+  2. Ramene-les dans a dans un ordre approximatif <span class="comment">(~150 ops)</span>
+  3. Maintenant les bits de poids fort sont quasi uniformes par zones
+  4. Le radix demarre avec moins de passes effectives
+
+<span class="highlight">Cout du pre-tri :</span> ~200-300 ops
+<span class="highlight">Economie sur le radix :</span> 1-2 passes en moins = ~200-400 ops
+<span class="highlight">Bilan net :</span> -0 a -200 ops</div>
+
+        <h4>Attention</h4>
+        <p>Le pre-tri ajoute des operations. Le gain net depend de la qualite du pre-tri. Si mal calibre, ca peut <strong>augmenter</strong> le total.</p>
+    </div>
+
+    <!-- ==================== OPTIMISATION 6 ==================== -->
+    <h2>Piste 6 : Optimiser les pa de fin de passe</h2>
+
+    <div class="card impact-low">
+        <h3><span class="badge badge-low">IMPACT FAIBLE</span> Exploiter l'ordre dans b avant de pa</h3>
+
+        <h4>Principe</h4>
+        <p>Apres une passe de radix, les elements dans b sont dans un certain ordre. Si les premiers elements de b sont deja proches de leur position finale dans a, on peut les <code>pa</code> de maniere strategique plutot que tout d'un coup.</p>
+
+        <p>Par exemple, si apres la passe du bit 2, les elements dans b sont partiellement tries pour les bits 0-1 (grace aux passes precedentes), certains sont deja bien places.</p>
+
+        <h4>Gain estime</h4>
+        <div class="meter">
+            <div class="meter-label">100 nombres</div>
+            <div class="meter-bar"><div class="meter-fill" style="width:10%; background:#6e40c9;"></div></div>
+            <div class="meter-value" style="color:#6e40c9;">-20 a -80 ops</div>
+        </div>
+    </div>
+
+    <!-- ==================== OPTIMISATION 7 ==================== -->
+    <h2>Piste 7 : Commencer par le MSB (Most Significant Bit)</h2>
+
+    <div class="card impact-med">
+        <h3><span class="badge badge-med">IMPACT MOYEN</span> Radix MSD au lieu de LSD</h3>
+
+        <h4>Principe</h4>
+        <p>Ton radix actuel est LSD (part du bit 0). Un radix MSD part du bit le plus significatif et descend.</p>
+
+        <h4>Avantage</h4>
+        <p>Le MSD cree des <strong>partitions</strong> des le depart. Apres la premiere passe (bit de poids fort), tu as deux groupes : les "petits" (bit=0) et les "grands" (bit=1). Chaque groupe est deja dans la bonne moitie.</p>
+
+        <p>Pour les passes suivantes, tu ne tries que les elements qui en ont besoin. Si un sous-groupe est deja trie, tu le skippes.</p>
+
+        <div class="diagram"><span class="label">Radix MSD sur 8 elements (index 0-7, 3 bits) :</span>
+
+<span class="highlight">Passe bit 2 :</span> separe {0,1,2,3} et {4,5,6,7}        → 2 groupes
+<span class="highlight">Passe bit 1 :</span> dans chaque groupe, separe les paires → 4 groupes
+<span class="highlight">Passe bit 0 :</span> dans chaque paire, swap si necessaire  → trie
+
+<span class="comment">Avantage : si {4,5,6,7} est deja trie apres la passe bit 2,
+les passes bit 1 et 0 ne s'appliquent qu'a {0,1,2,3}</span></div>
+
+        <h4>Difficulte</h4>
+        <p>Avec seulement 2 stacks, gerer les sous-groupes recursifs est complexe. Il faut garder en memoire les bornes de chaque partition. Faisable mais plus difficile a implementer que le LSD.</p>
+
+        <h4>Gain estime</h4>
+        <div class="meter">
+            <div class="meter-label">100 nombres</div>
+            <div class="meter-bar"><div class="meter-fill" style="width:30%; background:#d29922;"></div></div>
+            <div class="meter-value" style="color:#d29922;">-100 a -300 ops</div>
+        </div>
+    </div>
+
+    <!-- ==================== SYNTHESE ==================== -->
+    <h2>Synthese et estimations combinees</h2>
+
+    <div class="summary-box">
+        <h3 style="color:#58a6ff;">Estimation des gains cumulables</h3>
+        <p style="margin: 10px 0; color:#8b949e;">Ton radix actuel : ~1200-1500 ops pour 100 nombres</p>
+
+        <table>
+            <tr><th>Piste</th><th>Gain estime</th><th>Difficulte</th><th>Cumulable</th></tr>
+            <tr>
+                <td>1. Skip passes uniformes</td>
+                <td style="color:#3fb950;">-100 a -300</td>
+                <td>Facile</td>
+                <td style="color:#3fb950;">Oui, avec tout</td>
+            </tr>
+            <tr>
+                <td>2. Tri par groupe minoritaire</td>
+                <td style="color:#d29922;">-100 a -200</td>
+                <td>Moyen</td>
+                <td style="color:#3fb950;">Oui, avec 1, 3</td>
+            </tr>
+            <tr>
+                <td>3. Ping-pong (alterner le sens)</td>
+                <td style="color:#3fb950;">-200 a -400</td>
+                <td>Difficile</td>
+                <td style="color:#d29922;">Oui, avec 1, 2</td>
+            </tr>
+            <tr>
+                <td>4. Base 4</td>
+                <td style="color:#d29922;">-150 a -300</td>
+                <td>Difficile</td>
+                <td style="color:#f85149;">Remplace 3</td>
+            </tr>
+            <tr>
+                <td>5. Pre-tri partiel</td>
+                <td style="color:#d29922;">0 a -200</td>
+                <td>Moyen</td>
+                <td style="color:#3fb950;">Oui, avec 1</td>
+            </tr>
+            <tr>
+                <td>6. Optimisation des pa</td>
+                <td style="color:#6e40c9;">-20 a -80</td>
+                <td>Facile</td>
+                <td style="color:#3fb950;">Oui, avec tout</td>
+            </tr>
+            <tr>
+                <td>7. Radix MSD</td>
+                <td style="color:#d29922;">-100 a -300</td>
+                <td>Difficile</td>
+                <td style="color:#f85149;">Remplace le LSD</td>
+            </tr>
+        </table>
+
+        <h3 style="margin-top:25px; color:#d29922;">Meilleure combinaison realiste</h3>
+        <p style="margin-top:8px;">En combinant les pistes <strong>1 + 2 + 3</strong> (skip + minoritaire + ping-pong) :</p>
+
+        <div class="meter" style="margin-top:15px;">
+            <div class="meter-label">Actuel</div>
+            <div class="meter-bar"><div class="meter-fill" style="width:100%; background:linear-gradient(90deg, #f85149, #d29922);"></div></div>
+            <div class="meter-value" style="color:#f85149;">~1200-1500</div>
+        </div>
+        <div class="meter">
+            <div class="meter-label">Optimise</div>
+            <div class="meter-bar"><div class="meter-fill" style="width:60%; background:linear-gradient(90deg, #d29922, #3fb950);"></div></div>
+            <div class="meter-value" style="color:#d29922;">~700-1000</div>
+        </div>
+        <div class="meter">
+            <div class="meter-label">Objectif</div>
+            <div class="meter-bar"><div class="meter-fill" style="width:47%; background:#3fb950;"></div></div>
+            <div class="meter-value" style="color:#3fb950;">&lt; 700</div>
+        </div>
+
+        <p style="margin-top:20px; color:#d29922; font-weight:bold;">Verdict honnete : meme avec toutes les optimisations, descendre sous 700 ops pour 100 nombres avec un radix O(n log n) est extremement difficile. Le plancher theorique d'un radix pour 100 nombres est autour de ~600-700 ops, ce qui laisse tres peu de marge.</p>
+
+        <p style="margin-top:10px;">La piste <strong>1 (skip des passes uniformes)</strong> est la plus facile et la plus rentable en ratio effort/gain. C'est celle a implementer en premier.</p>
+    </div>
+
+    <div class="card warning">
+        <h3 style="color:#d29922;">Rappel important</h3>
+        <p>Le seuil "excellent" (&lt; 700 ops pour 100 nombres) est un <strong>objectif global de performance</strong>, teste probablement avec le mode <code>--adaptive</code>. Si les inputs random tombent souvent dans le regime high disorder (&ge; 0.5), tu seras force en O(n log n), et ~700-1000 ops optimise est le mieux que tu puisses esperer.</p>
+        <p style="margin-top:10px;">Le palier <strong>"bon" (&lt; 1500)</strong> est largement atteignable avec les pistes 1 et 2 seules.</p>
+    </div>
+
+</div>
+</body>
+</html>

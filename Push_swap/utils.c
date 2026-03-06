@@ -14,12 +14,19 @@
 
 void	ft_free(char **args, t_sta *tab)
 {
+	int	i;
+
+	i = 0;
 	if (tab -> stack_a)
 		ft_lstclear(&tab -> stack_a, NULL);
 	if (tab -> stack_b)
 		ft_lstclear(&tab -> stack_b, NULL);
 	if (tab -> need_free == 1)
+	{		
+		while (args[i])
+			free(args[i++]);
 		free(args);
+	}
 	free(tab);
 }
 
@@ -38,11 +45,9 @@ int	is_sorted_stack(t_list *stack)
 //Check doubles in stack
 int	check_doubles(t_list *stack)
 {
-	int		i;
 	t_list	*nb;
 	t_list	*tmp;
 
-	i = 0;
 	nb = stack;
 	while (nb != NULL)
 	{
@@ -54,7 +59,6 @@ int	check_doubles(t_list *stack)
 			tmp = tmp -> next;
 		}
 		nb = nb -> next;
-		i++;
 	}
 	return (1);
 }

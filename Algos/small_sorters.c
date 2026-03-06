@@ -12,6 +12,18 @@
 
 #include "../Push_swap/push_swap.h"
 
+void	small_sorters(t_sta *tab)
+{
+	if (is_sorted_stack(tab->stack_a))
+		return ;
+	if ((int)tab -> lena == 3)
+		ft_threefast(tab);
+	else if ((tab -> lena == 5 || tab -> lena == 4))
+		ft_fivast(tab);
+	else if ((int)tab -> lena == 2)
+		sa(tab, &tab -> stack_a);
+}
+
 //Sorter for 4 and 5 numbers list
 void	ft_fivast(t_sta *tab)
 {

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparaison Push_swap v10.0 vs v10.1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.7; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #58a6ff; font-size: 2.2em; margin: 30px 0 10px; }
+        .subtitle { text-align: center; color: #8b949e; margin-bottom: 30px; font-size: 1.1em; }
+        h2 { color: #58a6ff; margin: 35px 0 15px; font-size: 1.5em; border-left: 4px solid #58a6ff; padding-left: 12px; }
+        h3 { color: #79c0ff; margin: 15px 0 8px; font-size: 1.15em; }
+
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin: 15px 0; }
+
+        .added { border-left: 4px solid #3fb950; }
+        .removed { border-left: 4px solid #f85149; }
+        .changed { border-left: 4px solid #d29922; }
+        .same { border-left: 4px solid #484f58; }
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78em; font-weight: bold; margin-right: 6px; vertical-align: middle; }
+        .badge-add { background: #238636; color: #fff; }
+        .badge-rm { background: #da3633; color: #fff; }
+        .badge-chg { background: #9e6a03; color: #fff; }
+        .badge-same { background: #484f58; color: #ccc; }
+        .badge-v10 { background: #6e40c9; color: #fff; }
+        .badge-v101 { background: #1f6feb; color: #fff; }
+
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px 14px; text-align: left; border: 1px solid #30363d; }
+        th { background: #21262d; color: #58a6ff; font-weight: 600; }
+        tr:nth-child(even) { background: #161b22; }
+        tr:nth-child(odd) { background: #0d1117; }
+
+        code { background: #21262d; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; color: #f0883e; font-size: 0.9em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 15px; overflow-x: auto; margin: 10px 0; }
+        pre code { background: none; padding: 0; color: #c9d1d9; }
+
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 850px) { .compare-grid { grid-template-columns: 1fr; } }
+
+        .col-v10 { background: #1a0a2e; border: 1px solid #6e40c9; border-radius: 8px; padding: 18px; }
+        .col-v101 { background: #0a1929; border: 1px solid #1f6feb; border-radius: 8px; padding: 18px; }
+        .col-v10 h3 { color: #a371f7; }
+        .col-v101 h3 { color: #58a6ff; }
+
+        .summary-box { background: linear-gradient(135deg, #161b22, #1c2333); border: 2px solid #d29922; border-radius: 10px; padding: 25px; margin: 25px 0; }
+        .summary-box h3 { color: #d29922; margin-top: 0; }
+
+        .legend { display: flex; gap: 15px; flex-wrap: wrap; margin: 15px 0; padding: 12px; background: #161b22; border-radius: 8px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.9em; }
+        .legend-color { width: 14px; height: 14px; border-radius: 3px; }
+
+        .highlight { background: #1c1407; border: 1px solid #d29922; border-radius: 6px; padding: 15px; margin: 10px 0; }
+        .section-num { color: #8b949e; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Push_swap : v10.0 vs v10.1</h1>
+    <p class="subtitle">Comparaison complete des deux versions du sujet</p>
+
+    <div class="legend">
+        <div class="legend-item"><div class="legend-color" style="background:#3fb950;"></div> Ajoute dans v10.0 (absent de v10.1)</div>
+        <div class="legend-item"><div class="legend-color" style="background:#f85149;"></div> Supprime dans v10.1</div>
+        <div class="legend-item"><div class="legend-color" style="background:#d29922;"></div> Modifie entre les versions</div>
+        <div class="legend-item"><div class="legend-color" style="background:#484f58;"></div> Identique</div>
+    </div>
+
+    <!-- ==================== RESUME ==================== -->
+    <div class="summary-box">
+        <h3>Resume des differences majeures</h3>
+        <table>
+            <tr><th>Aspect</th><th><span class="badge badge-v10">v10.0</span></th><th><span class="badge badge-v101">v10.1</span></th></tr>
+            <tr>
+                <td><strong>Type de projet</strong></td>
+                <td style="color:#f85149;">Projet de groupe (2 learners)</td>
+                <td style="color:#3fb950;">Projet individuel</td>
+            </tr>
+            <tr>
+                <td><strong>4 algorithmes obligatoires</strong></td>
+                <td style="color:#f85149;">OUI - Simple O(n2), Medium O(n*sqrt(n)), Complex O(n log n), Adaptive</td>
+                <td style="color:#3fb950;">NON - Libre choix</td>
+            </tr>
+            <tr>
+                <td><strong>Disorder metric</strong></td>
+                <td style="color:#f85149;">OBLIGATOIRE avec pseudocode impose</td>
+                <td style="color:#3fb950;">Non mentionne</td>
+            </tr>
+            <tr>
+                <td><strong>Flags --simple/--medium/--complex/--adaptive</strong></td>
+                <td style="color:#f85149;">OBLIGATOIRES</td>
+                <td style="color:#3fb950;">Non requis</td>
+            </tr>
+            <tr>
+                <td><strong>Mode --bench</strong></td>
+                <td style="color:#f85149;">OBLIGATOIRE (disorder%, strategie, ops detaillees)</td>
+                <td style="color:#3fb950;">Non requis</td>
+            </tr>
+            <tr>
+                <td><strong>Complexite par regime de disorder</strong></td>
+                <td style="color:#f85149;">OBLIGATOIRE (O(n) si &lt;0.2, O(n*sqrt(n)) si 0.2-0.5, O(n log n) si &ge;0.5)</td>
+                <td style="color:#3fb950;">Non requis</td>
+            </tr>
+            <tr>
+                <td><strong>Benchmarks 100 nombres</strong></td>
+                <td>&lt;2000 (min) / &lt;1500 (bon) / &lt;700 (excellent)</td>
+                <td>&lt;1300 (min) / &lt;1100 (80%) / &lt;700 (100%)</td>
+            </tr>
+            <tr>
+                <td><strong>Benchmarks 500 nombres</strong></td>
+                <td>&lt;12000 (min) / &lt;8000 (bon) / &lt;5500 (excellent)</td>
+                <td>&lt;11500 (min) / &lt;8500 (80%) / &lt;5500 (100%)</td>
+            </tr>
+            <tr>
+                <td><strong>README : justification des algos</strong></td>
+                <td style="color:#f85149;">OBLIGATOIRE</td>
+                <td style="color:#3fb950;">Non mentionne explicitement</td>
+            </tr>
+            <tr>
+                <td><strong>Foreword</strong></td>
+                <td>Explication Big-O notation</td>
+                <td>Hello World dans 10+ langages</td>
+            </tr>
+            <tr>
+                <td><strong>Nombre de pages</strong></td>
+                <td>21 pages</td>
+                <td>19 pages</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ==================== STRUCTURE ==================== -->
+    <h2>Structure des chapitres</h2>
+
+    <div class="card changed">
+        <table>
+            <tr><th>#</th><th><span class="badge badge-v10">v10.0</span></th><th><span class="badge badge-v101">v10.1</span></th><th>Statut</th></tr>
+            <tr><td>I</td><td>Foreword (Big-O)</td><td>Foreword (Hello World multi-langages)</td><td><span class="badge badge-chg">MODIFIE</span></td></tr>
+            <tr><td>II</td><td>Common Instructions</td><td>Introduction</td><td><span class="badge badge-chg">REORGANISE</span></td></tr>
+            <tr><td>III</td><td>AI Instructions</td><td>Objectives</td><td><span class="badge badge-chg">REORGANISE</span></td></tr>
+            <tr><td>IV</td><td>Introduction</td><td>Common Instructions</td><td><span class="badge badge-chg">REORGANISE</span></td></tr>
+            <tr><td>V</td><td>Objectives</td><td>AI Instructions</td><td><span class="badge badge-chg">REORGANISE</span></td></tr>
+            <tr><td>VI</td><td>Mandatory part (9 sous-sections)</td><td>Mandatory part (4 sous-sections)</td><td><span class="badge badge-chg">SIMPLIFIE</span></td></tr>
+            <tr><td>VII</td><td>Readme Requirements</td><td>Readme Requirements</td><td><span class="badge badge-chg">MODIFIE</span></td></tr>
+            <tr><td>VIII</td><td>Bonus part</td><td>Bonus part</td><td><span class="badge badge-same">IDENTIQUE</span></td></tr>
+            <tr><td>IX</td><td>Submission</td><td>Submission</td><td><span class="badge badge-same">IDENTIQUE</span></td></tr>
+        </table>
+    </div>
+
+    <!-- ==================== PROJET GROUPE ==================== -->
+    <h2>Projet groupe vs individuel</h2>
+
+    <div class="card removed">
+        <h3><span class="badge badge-rm">SUPPRIME en v10.1</span> Section VI.1 - Group project requirements (v10.0)</h3>
+        <p>La v10.0 imposait :</p>
+        <ul>
+            <li>Projet a <strong>exactement 2 learners</strong></li>
+            <li>Les 2 doivent contribuer et comprendre tous les algorithmes</li>
+            <li>Le README doit indiquer les contributions de chacun</li>
+            <li>Les 2 doivent etre presents a la defense et capables d'expliquer tout le code</li>
+            <li>Les logins des 2 doivent etre dans le repo</li>
+        </ul>
+        <p style="margin-top:10px; color:#3fb950;"><strong>v10.1 :</strong> Aucune mention de groupe. Projet individuel.</p>
+    </div>
+
+    <!-- ==================== FOREWORD ==================== -->
+    <h2>Foreword</h2>
+
+    <div class="compare-grid">
+        <div class="col-v10">
+            <h3><span class="badge badge-v10">v10.0</span> Big-O Notation</h3>
+            <p>Explication pedagogique de la notation Big-O avec humour :</p>
+            <ul>
+                <li>Reference a Donald Knuth</li>
+                <li>Explication de pourquoi O(n log n) bat O(n2)</li>
+                <li>Conseil : "Sort smart, not slow"</li>
+                <li>Contexte algorithmique pour le projet</li>
+            </ul>
+        </div>
+        <div class="col-v101">
+            <h3><span class="badge badge-v101">v10.1</span> Hello World</h3>
+            <p>"Hello World" dans 10+ langages :</p>
+            <ul>
+                <li>C, ASM, LOLCODE, PHP, BrainFuck</li>
+                <li>C#, HTML5, YASL, OCaml</li>
+                <li>Aucun contenu pedagogique sur les algorithmes</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ==================== OBJECTIVES ==================== -->
+    <h2>Objectives</h2>
+
+    <div class="compare-grid">
+        <div class="col-v10">
+            <h3><span class="badge badge-v10">v10.0</span></h3>
+            <p><em>"The goal of this project is to make you discover algorithmic complexity in a very concrete way."</em></p>
+            <p>Mentionne explicitement :</p>
+            <ul>
+                <li>La difference entre liste random et liste presque triee</li>
+                <li>Le choix d'algorithme impacte le resultat</li>
+            </ul>
+        </div>
+        <div class="col-v101">
+            <h3><span class="badge badge-v101">v10.1</span></h3>
+            <p>Plus generique :</p>
+            <ul>
+                <li>"Writing a sorting algorithm is always a crucial step"</li>
+                <li>Mention de la complexite comme concept d'interview</li>
+                <li>Rigor, proficiency in C, basic algorithms</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ==================== ALGORITHMES ==================== -->
+    <h2>Exigences algorithmiques - La plus grosse difference</h2>
+
+    <div class="card removed">
+        <h3><span class="badge badge-rm">SUPPRIME en v10.1</span> Section VI.3 - Algorithm requirements (v10.0 uniquement)</h3>
+        <p style="color:#f85149; font-weight:bold; font-size:1.1em;">Toute cette section n'existe pas dans v10.1.</p>
+    </div>
+
+    <div class="card removed">
+        <h3><span class="badge badge-rm">SUPPRIME</span> VI.3.1 - Complexity model and operation constraints</h3>
+        <p>La v10.0 imposait que la complexite soit mesuree <strong>en nombre d'operations push_swap generees</strong>, pas en complexite theorique classique.</p>
+    </div>
+
+    <div class="card removed">
+        <h3><span class="badge badge-rm">SUPPRIME</span> VI.3.2 - Disorder metric (mandatory)</h3>
+        <p>La v10.0 imposait le calcul du <strong>disorder</strong> (nombre entre 0 et 1) avec ce pseudocode :</p>
+        <pre><code>function compute_disorder(stack a):
+    mistakes = 0
+    total_pairs = 0
+    for i from 0 to size(a)-1:
+        for j from i+1 to size(a)-1:
+            total_pairs += 1
+            if a[i] > a[j]:
+                mistakes += 1
+    return mistakes / total_pairs</code></pre>
+        <p>Regle : <em>"You must measure the disorder <strong>before</strong> doing any moves."</em></p>
+        <p style="color:#3fb950;"><strong>v10.1 :</strong> Aucune mention du disorder.</p>
+    </div>
+
+    <div class="card removed">
+        <h3><span class="badge badge-rm">SUPPRIME</span> VI.3.3 - Required strategies (4 algorithmes obligatoires)</h3>
+
+        <div class="highlight">
+            <h3>1. Simple algorithm - O(n2)</h3>
+            <p>Exemples : insertion sort, selection sort, bubble sort, min/max extraction</p>
+        </div>
+
+        <div class="highlight">
+            <h3>2. Medium algorithm - O(n * sqrt(n))</h3>
+            <p>Exemples : chunk-based sorting, block-based partitioning, bucket sort avec sqrt(n) buckets, range-based</p>
+        </div>
+
+        <div class="highlight">
+            <h3>3. Complex algorithm - O(n log n)</h3>
+            <p>Exemples : radix sort (LSD/MSD), merge sort, quick sort, heap sort, binary indexed tree</p>
+        </div>
+
+        <div class="highlight" style="border-color: #f85149;">
+            <h3>4. Custom adaptive algorithm (basee sur le disorder)</h3>
+            <p>Devait selectionner automatiquement une methode selon le disorder mesure :</p>
+            <table>
+                <tr><th>Regime</th><th>Condition</th><th>Complexite requise</th></tr>
+                <tr><td style="color:#3fb950;">Low disorder</td><td>disorder &lt; 0.2</td><td><strong>O(n)</strong></td></tr>
+                <tr><td style="color:#d29922;">Medium disorder</td><td>0.2 &le; disorder &lt; 0.5</td><td><strong>O(n * sqrt(n))</strong></td></tr>
+                <tr><td style="color:#f85149;">High disorder</td><td>disorder &ge; 0.5</td><td><strong>O(n log n)</strong></td></tr>
+            </table>
+            <p style="margin-top:10px;">Le README devait documenter les seuils, les techniques internes, et l'argument de complexite.</p>
+        </div>
+
+        <p style="margin-top:15px; color:#3fb950; font-size:1.05em;"><strong>v10.1 :</strong> Aucune de ces exigences. Tu es libre de choisir ton/tes algorithme(s). Seuls les benchmarks comptent.</p>
+    </div>
+
+    <!-- ==================== PROGRAMME PUSH_SWAP ==================== -->
+    <h2>Le programme push_swap</h2>
+
+    <div class="card removed">
+        <h3><span class="badge badge-rm">SUPPRIME en v10.1</span> Strategy selector (flags)</h3>
+        <p>La v10.0 imposait les flags suivants :</p>
+        <table>
+            <tr><th>Flag</th><th>Effet</th></tr>
+            <tr><td><code>--simple</code></td><td>Force l'algorithme O(n2)</td></tr>
+            <tr><td><code>--medium</code></td><td>Force l'algorithme O(n * sqrt(n))</td></tr>
+            <tr><td><code>--complex</code></td><td>Force l'algorithme O(n log n)</td></tr>
+            <tr><td><code>--adaptive</code></td><td>Algorithme adaptatif base sur le disorder (defaut)</td></tr>
+        </table>
+        <p style="color:#3fb950; margin-top:10px;"><strong>v10.1 :</strong> Pas de flags. Juste <code>./push_swap [liste d'entiers]</code></p>
+    </div>
+
+    <div class="card removed">
+        <h3><span class="badge badge-rm">SUPPRIME en v10.1</span> Mode benchmark (--bench)</h3>
+        <p>La v10.0 imposait un mode <code>--bench</code> affichant sur stderr :</p>
+        <ul>
+            <li>Le <strong>disorder</strong> calcule (% avec 2 decimales)</li>
+            <li>Le <strong>nom de la strategie</strong> et sa classe de complexite</li>
+            <li>Le <strong>nombre total</strong> d'operations</li>
+            <li>Le <strong>decompte de chaque operation</strong> (sa, sb, ss, pa, pb, ra, rb, rr, rra, rrb, rrr)</li>
+        </ul>
+        <p>Exemple v10.0 :</p>
+        <pre><code>[bench] disorder: 49.93%
+[bench] strategy: Adaptive / O(n*sqrt(n))
+[bench] total_ops: 7997
+[bench] sa: 0  sb: 0  ss: 0  pa: 500  pb: 500
+[bench] ra: 4840  rb: 1098  rr: 0  rra: 0  rrb: 1059  rrr: 0</code></pre>
+        <p style="color:#3fb950;"><strong>v10.1 :</strong> Aucun mode benchmark requis.</p>
+    </div>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> Regles communes aux deux versions</h3>
+        <ul>
+            <li>Makefile avec <code>$(NAME)</code>, <code>all</code>, <code>clean</code>, <code>fclean</code>, <code>re</code></li>
+            <li>Pas de variables globales</li>
+            <li>11 operations identiques (sa, sb, ss, pa, pb, ra, rb, rr, rra, rrb, rrr)</li>
+            <li>Instructions separees par <code>\n</code></li>
+            <li>Sans arguments : rien afficher</li>
+            <li>En cas d'erreur : <code>"Error\n"</code> sur stderr</li>
+            <li>Fonctions externes : read, write, malloc, free, exit, ft_printf maison</li>
+            <li>Libft autorisee</li>
+            <li>Compilation <code>-Wall -Wextra -Werror</code></li>
+        </ul>
+    </div>
+
+    <!-- ==================== BENCHMARKS ==================== -->
+    <h2>Performance Benchmarks</h2>
+
+    <div class="card changed">
+        <h3><span class="badge badge-chg">MODIFIE</span> Seuils de performance</h3>
+
+        <h3 style="margin-top:15px;">100 nombres</h3>
+        <table>
+            <tr><th>Niveau</th><th><span class="badge badge-v10">v10.0</span></th><th><span class="badge badge-v101">v10.1</span></th></tr>
+            <tr><td>Minimum pour valider</td><td>&lt; 2000 ops</td><td>&lt; 1300 ops</td></tr>
+            <tr><td>Bonne perf / 80%</td><td>&lt; 1500 ops</td><td>&lt; 1100 ops</td></tr>
+            <tr><td>Excellente / 100%</td><td>&lt; 700 ops</td><td>&lt; 700 ops</td></tr>
+        </table>
+
+        <h3 style="margin-top:20px;">500 nombres</h3>
+        <table>
+            <tr><th>Niveau</th><th><span class="badge badge-v10">v10.0</span></th><th><span class="badge badge-v101">v10.1</span></th></tr>
+            <tr><td>Minimum pour valider</td><td>&lt; 12000 ops</td><td>&lt; 11500 ops</td></tr>
+            <tr><td>Bonne perf / 80%</td><td>&lt; 8000 ops</td><td>&lt; 8500 ops</td></tr>
+            <tr><td>Excellente / 100%</td><td>&lt; 5500 ops</td><td>&lt; 5500 ops</td></tr>
+        </table>
+
+        <p style="margin-top:15px; color:#d29922;">Les seuils excellents (700 / 5500) sont identiques. Les seuils minimaux sont <strong>plus stricts en v10.1</strong> pour 100 nombres (1300 au lieu de 2000) mais <strong>plus souples en v10.0</strong> pour le palier "bon" de 500 (8000 vs 8500).</p>
+    </div>
+
+    <!-- ==================== README ==================== -->
+    <h2>README Requirements</h2>
+
+    <div class="card changed">
+        <h3><span class="badge badge-chg">MODIFIE</span></h3>
+
+        <div class="compare-grid">
+            <div class="col-v10">
+                <h3><span class="badge badge-v10">v10.0</span></h3>
+                <p>Sections requises :</p>
+                <ul>
+                    <li>Premiere ligne en italique avec logins</li>
+                    <li>Section "Description"</li>
+                    <li>Section "Instructions"</li>
+                    <li>Section "Resources" + utilisation IA</li>
+                    <li style="color:#f85149;"><strong>+ Explication et justification detaillees des algorithmes selectionnes</strong></li>
+                    <li style="color:#f85149;"><strong>+ Contributions des 2 membres</strong></li>
+                </ul>
+            </div>
+            <div class="col-v101">
+                <h3><span class="badge badge-v101">v10.1</span></h3>
+                <p>Sections requises :</p>
+                <ul>
+                    <li>Premiere ligne en italique avec login</li>
+                    <li>Section "Description"</li>
+                    <li>Section "Instructions"</li>
+                    <li>Section "Resources" + utilisation IA</li>
+                    <li style="color:#8b949e;">(Pas de justification d'algorithmes requise)</li>
+                    <li style="color:#8b949e;">(Pas de contributions de groupe)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== BONUS ==================== -->
+    <h2>Bonus (Checker)</h2>
+
+    <div class="card same">
+        <h3><span class="badge badge-same">IDENTIQUE</span> dans les deux versions</h3>
+        <p>Le programme <code>checker</code> est identique : memes specs, memes regles d'erreur, meme fonctionnement (lit les ops sur stdin, affiche OK/KO).</p>
+    </div>
+
+    <!-- ==================== IMPACT ==================== -->
+    <h2>Impact sur ton projet</h2>
+
+    <div class="summary-box" style="border-color: #f85149;">
+        <h3 style="color: #f85149;">Si tu es sur la v10.0 (projet de groupe)</h3>
+        <p>Tu dois imperativement avoir :</p>
+        <ul style="margin-top:10px;">
+            <li><span class="badge badge-rm">CRITIQUE</span> <strong>4 algorithmes distincts</strong> : Simple O(n2), Medium O(n*sqrt(n)), Complex O(n log n), Adaptive</li>
+            <li><span class="badge badge-rm">CRITIQUE</span> <strong>Calcul du disorder</strong> obligatoire (tu l'as deja)</li>
+            <li><span class="badge badge-rm">CRITIQUE</span> <strong>Flags</strong> <code>--simple</code>, <code>--medium</code>, <code>--complex</code>, <code>--adaptive</code> (tu les as deja)</li>
+            <li><span class="badge badge-rm">CRITIQUE</span> <strong>Mode --bench</strong> sur stderr avec disorder%, strategie, ops detaillees (tu l'as deja)</li>
+            <li><span class="badge badge-rm">CRITIQUE</span> <strong>Complexite par regime</strong> : O(n) pour disorder &lt;0.2, O(n*sqrt(n)) pour 0.2-0.5, O(n log n) pour &ge;0.5</li>
+            <li><span class="badge badge-rm">CRITIQUE</span> <strong>README</strong> avec justification des algorithmes + contributions des 2 membres</li>
+            <li><span class="badge badge-rm">CRITIQUE</span> <strong>2 membres</strong> dans le repo</li>
+        </ul>
+    </div>
+
+    <div class="summary-box" style="border-color: #3fb950;">
+        <h3 style="color: #3fb950;">Si tu es sur la v10.1 (projet individuel)</h3>
+        <p>C'est beaucoup plus simple :</p>
+        <ul style="margin-top:10px;">
+            <li>Pas de flags obligatoires</li>
+            <li>Pas de disorder obligatoire</li>
+            <li>Pas de benchmark obligatoire</li>
+            <li>Libre choix de l'algorithme, seuls les benchmarks comptent</li>
+            <li>README plus simple (pas de justification d'algo requise)</li>
+            <li>Tu peux utiliser Turk Sort partout si ca donne les meilleurs benchmarks</li>
+        </ul>
+    </div>
+
+    <div class="summary-box">
+        <h3>Ton code actuel vs les deux versions</h3>
+        <table>
+            <tr><th>Element</th><th>Ton code</th><th>v10.0</th><th>v10.1</th></tr>
+            <tr><td>4 algos distincts</td><td style="color:#3fb950;">Oui (Simple, Medium, Complex, Turk + Adaptive)</td><td>Requis</td><td>Non requis</td></tr>
+            <tr><td>Disorder metric</td><td style="color:#3fb950;">Oui</td><td>Requis</td><td>Non requis</td></tr>
+            <tr><td>Flags --simple/--medium etc.</td><td style="color:#3fb950;">Oui</td><td>Requis</td><td>Non requis</td></tr>
+            <tr><td>Mode --bench</td><td style="color:#3fb950;">Oui</td><td>Requis</td><td>Non requis</td></tr>
+            <tr><td>Adaptive par disorder</td><td style="color:#3fb950;">Oui</td><td>Requis</td><td>Non requis</td></tr>
+            <tr><td>O(n) pour disorder &lt;0.2</td><td style="color:#d29922;">Selection sort = O(n2), pas O(n)</td><td style="color:#f85149;">Requis O(n)</td><td>Non requis</td></tr>
+            <tr><td>Benchmark 100 &lt;700</td><td style="color:#f85149;">~1484 (adaptatif)</td><td>Excellent</td><td>100%</td></tr>
+            <tr><td>Benchmark 500 &lt;5500</td><td style="color:#f85149;">~7791 (adaptatif)</td><td>Excellent</td><td>100%</td></tr>
+            <tr><td>README.md</td><td style="color:#f85149;">Absent</td><td>Requis + algos</td><td>Requis</td></tr>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

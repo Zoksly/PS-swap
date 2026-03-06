@@ -37,7 +37,7 @@ int	find_chunk_in_stack(t_sta *tab, int *sorted_array, int chk_targ, int chk_sz)
 }
 
 //push stack_a to tack_b, in chunks
-void push_chunk(t_sta *tab, int nb_node, int *array, int chunk_size)
+void	push_chunk(t_sta *tab, int nb_node, int *array, int chunk_size)
 {
     int i_chunks;
     int n_index;
@@ -68,6 +68,8 @@ void	ft_medium(t_sta *tab, int nb_node)
 	chunk_size = ft_chunk_size(nb_node);
 	stacka = tab -> stack_a;
 	array = stack_to_array(stacka, tab -> lena, 1);
+	if (!array)
+		return ;
 	push_chunk(tab, nb_node, array, chunk_size);
 	while (tab -> stack_b)
 	{

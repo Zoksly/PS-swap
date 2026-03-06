@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse du Sujet Push_swap v10.1</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --primary: #58a6ff;
+            --danger: #f85149;
+            --success: #3fb950;
+            --warning: #d29922;
+            --card-bg: #161b22;
+            --border: #30363d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 { color: var(--primary); }
+        h1 { border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        
+        .section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .badge-danger { background-color: rgba(248, 81, 73, 0.2); color: var(--danger); }
+        .badge-success { background-color: rgba(63, 185, 80, 0.2); color: var(--success); }
+        .badge-info { background-color: rgba(88, 166, 255, 0.2); color: var(--primary); }
+        
+        code {
+            background-color: rgba(110, 118, 129, 0.4);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 85%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th { background-color: rgba(110, 118, 129, 0.1); }
+        
+        ul { padding-left: 20px; }
+        .highlight { color: var(--warning); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📄 Rapport d'Analyse : Sujet Push_swap (v10.1)</h1>
+    <p>Ce rapport détaille exhaustivement toutes les exigences imposées par le sujet officiel de l'école 42.</p>
+
+    <div class="section">
+        <h2>1. Règles Générales et Restrictions C <span class="badge badge-danger">Critique</span></h2>
+        <ul>
+            <li><strong>Langage :</strong> C uniquement.</li>
+            <li><strong>Norme :</strong> Le code doit passer la Norminette à 100% (incluant les bonus si présents).</li>
+            <li><strong>Stabilité :</strong> Aucun crash inattendu (Segfault, bus error, double free). Sanction : <span class="badge badge-danger">Note = 0</span>.</li>
+            <li><strong>Gestion mémoire :</strong> AUCUNE fuite mémoire (memory leak) n'est tolérée sur la heap.</li>
+            <li><strong>Fonctions externes autorisées :</strong> <code>read</code>, <code>write</code>, <code>malloc</code>, <code>free</code>, <code>exit</code>.</li>
+            <li><strong>Libft :</strong> Autorisée (doit inclure son propre Makefile et être compilée par le Makefile principal).</li>
+            <li><strong>Interdictions formelles :</strong> Variables globales strictement interdites.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>2. Exigences du Makefile</h2>
+        <ul>
+            <li><strong>Flags obligatoires :</strong> <code>-Wall -Wextra -Werror</code> avec <code>cc</code>.</li>
+            <li><strong>Règles obligatoires :</strong> <code>$(NAME)</code>, <code>all</code>, <code>clean</code>, <code>fclean</code>, <code>re</code>.</li>
+            <li><strong>Relink :</strong> Le Makefile ne doit pas relink inutilement.</li>
+            <li><strong>Bonus :</strong> Doivent être dans des fichiers <code>_bonus.{c,h}</code> et compilés via une règle <code>bonus</code> séparée.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. Fonctionnement du Programme <code>push_swap</code></h2>
+        <p>Le programme reçoit en paramètre la pile <code>a</code> sous forme d'entiers. Le premier argument est le sommet de la pile.</p>
+        
+        <h3>Règles d'affichage et de sortie :</h3>
+        <ul>
+            <li>Le but est de trier la pile avec le plus petit nombre possible d'opérations.</li>
+            <li>Les instructions doivent être séparées par un <code>\n</code> et rien d'autre.</li>
+            <li><strong>Cas aucun paramètre :</strong> Le programme s'arrête discrètement sans <strong>RIEN</strong> afficher.</li>
+            <li><strong>Cas d'erreur :</strong> Afficher <code style="color:var(--danger)">Error\n</code> sur la <strong>Sortie d'Erreur Standard (stderr / fd 2)</strong>.
+                <ul>
+                    <li>Exemples de déclenchement : Entrée non numérique, overflow/underflow d'entier (limites INT), présence de doublons.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Set d'instructions autorisé :</h3>
+        <p><code>sa</code>, <code>sb</code>, <code>ss</code>, <code>pa</code>, <code>pb</code>, <code>ra</code>, <code>rb</code>, <code>rr</code>, <code>rra</code>, <code>rrb</code>, <code>rrr</code>.</p>
+    </div>
+
+    <div class="section">
+        <h2>4. Les Barèmes de Validation (Benchmarks) <span class="badge badge-info">Performance</span></h2>
+        <p>Pour valider le projet, l'algorithme doit trier efficacement :</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Taille du set</th>
+                    <th>Score / Grade</th>
+                    <th>Objectif d'opérations</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>100 nombres</td>
+                    <td><span class="badge badge-success">100% (Note max + Éligibilité Bonus)</span></td>
+                    <td><strong>&lt; 700</strong> ops</td>
+                </tr>
+                <tr>
+                    <td>100 nombres</td>
+                    <td>Validation Minimale (~80-90%)</td>
+                    <td>&lt; 1100 ops</td>
+                </tr>
+                <tr>
+                    <td>100 nombres</td>
+                    <td>Tolérance max</td>
+                    <td>&lt; 1300 ops</td>
+                </tr>
+                <tr>
+                    <td>500 nombres</td>
+                    <td><span class="badge badge-success">100% (Note max + Éligibilité Bonus)</span></td>
+                    <td><strong>&lt; 5500</strong> ops</td>
+                </tr>
+                <tr>
+                    <td>500 nombres</td>
+                    <td>Validation Minimale (~80-90%)</td>
+                    <td>&lt; 8500 ops</td>
+                </tr>
+                <tr>
+                    <td>500 nombres</td>
+                    <td>Tolérance max</td>
+                    <td>&lt; 11500 ops</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="highlight">⚠️ Note : L'éligibilité aux bonus exige la note parfaite (100% / note max) sur les benchmarks.</p>
+    </div>
+
+    <div class="section">
+        <h2>5. Requirement Spécial : Le README.md</h2>
+        <p>Le sujet v10.1 introduit une nouvelle exigence stricte concernant le dépôt git :</p>
+        <ul>
+            <li>La première ligne du README doit être (en italique) : <em>This project has been created as part of the 42 curriculum by [login1]</em>.</li>
+            <li>Section "Description" : Présentation rapide du projet.</li>
+            <li>Section "Instructions" : Comment compiler et lancer.</li>
+            <li>Section "Resources" : Références utilisées ET <strong>Description de la façon dont l'IA a été utilisée</strong> (si d'application).</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>6. Partie Bonus : Le programme <code>checker</code></h2>
+        <ul>
+            <li>Il prend la pile <code>a</code> en arguments (avec les mêmes gestions d'erreurs que push_swap).</li>
+            <li>Il lit sur l'entrée standard (stdin) les instructions une par une.</li>
+            <li>Si à la fin de la lecture, la pile a est triée et b est vide : il affiche <code>OK\n</code> sur <strong>stdout</strong>.</li>
+            <li>Sinon, il affiche <code>KO\n</code> sur <strong>stdout</strong>.</li>
+            <li>En cas d'erreur (format argument, ou instruction inexistante lue) : <code>Error\n</code> sur <strong>stderr</strong>.</li>
+        </ul>
+    </div>
+
+</div>
+</body>
+</html>

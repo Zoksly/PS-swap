@@ -42,12 +42,32 @@ typedef struct s_ops
 	int	total;
 }	t_ops;
 
+typedef struct s_count_ops
+{
+	int	c_ra;
+	int	c_rb;
+	int	c_rra;
+	int	c_rrb;
+	int	c_rrr;
+	int	c_rr;
+}	c_ops;
+
+typedef struct s_track
+{
+	int	best_cost;
+	int	best_index_a;
+	int	current_cost;
+	int	i_target;
+}	t_track;
+
 typedef struct s_sta
 {
 	t_list	*stack_a;
 	t_list	*stack_b;
 	int		benchm;
 	t_mode	mode;
+	c_ops	c_ops;
+	c_ops	best_ops;
 	float	disorder;
 	int		need_free;
 	int		lena;
@@ -90,7 +110,6 @@ void	ft_simple(t_sta *tab);
 /* Helpers Functions */
 int		ft_chunk_size(int i);
 int		get_index(t_list *node, int *array, int nb_elements);
-int		get_max_index(t_list *stack);
 void	sort_array(int *array, int size);
 int		*stack_to_array(t_list *stack, int size, int sort);
 
@@ -105,8 +124,19 @@ int		get_max_bits(int lena, int *array);
 void	check_bits(t_sta *tab, int i_bits, int *array, int nb_node);
 void	radix_sort(t_sta *tab);
 
-/* Hardcodes for 3 and 5 numbers */
+/* Turk Sort (Cost-Based Algorithm) */
+void	ft_turksort(t_sta *tab);
+void	push_to_a(t_sta *tab);
+int		get_target_in_a(t_sta *tab, int target);
+int		get_index_target(t_sta *tab, int target);
+void	free_c_ops(t_sta *tab);
+int		cost_rrr(t_sta *tab);
+int		cost_rr(t_sta *tab);
+void	execute_rotations(t_sta *tab);
+void	execute_single_rot(t_sta *tab);
 
+/* Hardcodes for 3 and 5 numbers */
+void	small_sorters(t_sta *tab);
 void	ft_threefast(t_sta *tab);
 void	ft_fivast(t_sta *tab);
 

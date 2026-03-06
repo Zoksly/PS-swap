@@ -1,0 +1,17 @@
+[OK - NO LEAKS ON ERROR] No args
+[OK - NO LEAKS ON ERROR] Empty string
+[OK - NO LEAKS ON ERROR] Space only string
+[OK - NO LEAKS ON ERROR] Invalid char
+[OK - NO LEAKS ON ERROR] Invalid char mixed
+[OK - NO LEAKS ON ERROR] Duplicate
+[OK - NO LEAKS ON ERROR] Duplicate separated
+[OK - NO LEAKS ON ERROR] INT MAX overflow
+[OK - NO LEAKS ON ERROR] INT MIN underflow
+[OK - NO LEAKS ON ERROR] Only sign
+[OK - NO LEAKS ON ERROR] Invalid signs
+[OK - NO LEAKS] Already sorted 3
+[OK - NO LEAKS] Already sorted 5
+[OK - NO LEAKS] 3 numbers (3 2 1)
+[OK - NO LEAKS] 5 numbers
+[OK - NO LEAKS] 100 numbers
+[OK - NO LEAKS] Max INT boundaries

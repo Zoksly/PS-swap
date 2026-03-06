@@ -17,7 +17,7 @@ static void	ft_r(t_list **stack1)
 	t_list	*first;
 	t_list	*last;
 
-	if (!(stack1) && !((*stack1)->next))
+	if (!(stack1) || !((*stack1)->next))
 		return ;
 	first = *stack1;
 	last = ft_lstlast(*stack1);

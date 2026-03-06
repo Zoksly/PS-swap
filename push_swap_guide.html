@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Push_swap - Guide Complet du Sujet</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #58a6ff; font-size: 2.2em; margin: 30px 0; border-bottom: 2px solid #30363d; padding-bottom: 15px; }
+        h2 { color: #58a6ff; margin: 30px 0 15px; font-size: 1.5em; border-left: 4px solid #58a6ff; padding-left: 12px; }
+        h3 { color: #79c0ff; margin: 20px 0 10px; font-size: 1.15em; }
+
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin: 15px 0; }
+        .card-ok { border-left: 4px solid #3fb950; }
+        .card-warn { border-left: 4px solid #d29922; }
+        .card-err { border-left: 4px solid #f85149; }
+        .card-info { border-left: 4px solid #58a6ff; }
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold; margin-right: 6px; }
+        .badge-ok { background: #238636; color: #fff; }
+        .badge-fail { background: #da3633; color: #fff; }
+        .badge-warn { background: #9e6a03; color: #fff; }
+        .badge-info { background: #1f6feb; color: #fff; }
+
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px 14px; text-align: left; border: 1px solid #30363d; }
+        th { background: #21262d; color: #58a6ff; font-weight: 600; }
+        tr:nth-child(even) { background: #161b22; }
+        tr:nth-child(odd) { background: #0d1117; }
+
+        code { background: #21262d; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; color: #f0883e; font-size: 0.9em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 15px; overflow-x: auto; margin: 10px 0; }
+        pre code { background: none; padding: 0; color: #c9d1d9; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+
+        .algo-box { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px; }
+        .algo-box h3 { margin-top: 0; }
+        .algo-name { font-size: 1.3em; color: #f0883e; margin-bottom: 5px; }
+        .complexity { color: #8b949e; font-style: italic; }
+
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 8px 0; border-bottom: 1px solid #21262d; }
+        .checklist li:last-child { border-bottom: none; }
+
+        .flowchart { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 25px; margin: 20px 0; text-align: center; }
+        .flow-step { display: inline-block; background: #21262d; border: 2px solid #30363d; border-radius: 8px; padding: 12px 18px; margin: 8px; vertical-align: middle; }
+        .flow-step.decision { border-color: #d29922; transform: rotate(0deg); background: #1c1407; }
+        .flow-arrow { display: inline-block; color: #58a6ff; font-size: 1.5em; vertical-align: middle; margin: 0 5px; }
+        .flow-row { margin: 10px 0; }
+
+        .benchmark-bar { height: 24px; border-radius: 4px; margin: 5px 0; position: relative; }
+        .benchmark-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 0.8em; font-weight: bold; }
+        .benchmark-label { display: flex; justify-content: space-between; font-size: 0.85em; color: #8b949e; }
+
+        .summary-box { background: linear-gradient(135deg, #161b22, #1c2333); border: 1px solid #30363d; border-radius: 10px; padding: 25px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Push_swap - Guide Complet</h1>
+
+    <!-- ===================== CONFORMITE ===================== -->
+    <h2>Conformite du projet avec le sujet</h2>
+
+    <div class="card card-ok">
+        <h3><span class="badge badge-ok">OK</span> Makefile</h3>
+        <ul class="checklist">
+            <li><span class="badge badge-ok">OK</span> Nom du programme : <code>push_swap</code></li>
+            <li><span class="badge badge-ok">OK</span> Compilation avec <code>-Wall -Wextra -Werror</code> via <code>cc</code></li>
+            <li><span class="badge badge-ok">OK</span> Regles presentes : <code>$(NAME)</code>, <code>all</code>, <code>clean</code>, <code>fclean</code>, <code>re</code></li>
+            <li><span class="badge badge-ok">OK</span> Pas de relink : <code>make</code> apres build affiche "Rien a faire"</li>
+            <li><span class="badge badge-ok">OK</span> Libft compilee via son propre Makefile</li>
+        </ul>
+    </div>
+
+    <div class="card card-ok">
+        <h3><span class="badge badge-ok">OK</span> Regles du programme</h3>
+        <ul class="checklist">
+            <li><span class="badge badge-ok">OK</span> Pas de variables globales</li>
+            <li><span class="badge badge-ok">OK</span> Instructions separees par <code>\n</code></li>
+            <li><span class="badge badge-ok">OK</span> Instructions sur <strong>stdout</strong> (fd 1)</li>
+            <li><span class="badge badge-ok">OK</span> Erreurs sur <strong>stderr</strong> (fd 2)</li>
+            <li><span class="badge badge-ok">OK</span> Fonctions externes autorisees uniquement : <code>read</code>, <code>write</code>, <code>malloc</code>, <code>free</code>, <code>exit</code>, ft_printf maison</li>
+        </ul>
+    </div>
+
+    <div class="card card-ok">
+        <h3><span class="badge badge-ok">OK</span> Gestion des erreurs</h3>
+        <table>
+            <tr><th>Cas</th><th>Comportement attendu</th><th>Ton code</th><th>Statut</th></tr>
+            <tr><td>Aucun argument</td><td>Rien afficher, quitter</td><td><code>return (0)</code> silencieux</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>Deja trie</td><td>Rien afficher</td><td>Calcul disorder = 0, free + quit</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>Un seul nombre</td><td>Rien afficher</td><td>disorder = 0, quit</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>Argument non-entier</td><td><code>Error\n</code> sur stderr</td><td><code>ft_putstr_fd("Error\n", 2)</code></td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>Depassement INT</td><td><code>Error\n</code> sur stderr</td><td>Check <code>ft_atol</code> vs INT_MAX/MIN</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>Doublons</td><td><code>Error\n</code> sur stderr</td><td><code>check_doubles()</code></td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>Chaine vide <code>""</code></td><td><code>Error\n</code> sur stderr</td><td>Gere par <code>ft_isnumber</code></td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>Nombres negatifs</td><td>Trier normalement</td><td>Fonctionne</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>INT_MIN / INT_MAX</td><td>Trier normalement</td><td>Fonctionne</td><td><span class="badge badge-ok">OK</span></td></tr>
+            <tr><td>Argument unique en string</td><td>Split et trier</td><td><code>ft_split(argv[i_arg], ' ')</code></td><td><span class="badge badge-ok">OK</span></td></tr>
+        </table>
+    </div>
+
+    <div class="card card-warn">
+        <h3><span class="badge badge-warn">ATTENTION</span> Benchmarks</h3>
+        <p>Les resultats actuels de ton programme :</p>
+        <table>
+            <tr><th>Taille</th><th>Ton resultat</th><th>100% (max)</th><th>80% (max)</th><th>Statut</th></tr>
+            <tr>
+                <td>100 nombres</td>
+                <td>~1484 ops</td>
+                <td>&lt; 700</td>
+                <td>&lt; 1100</td>
+                <td><span class="badge badge-fail">DEPASSE</span></td>
+            </tr>
+            <tr>
+                <td>500 nombres</td>
+                <td>~7791 ops</td>
+                <td>&lt; 5500</td>
+                <td>&lt; 8500</td>
+                <td><span class="badge badge-warn">80% OK</span></td>
+            </tr>
+        </table>
+        <p style="margin-top:10px; color:#d29922;"><strong>Pour valider a 100% :</strong> il faut &lt; 700 ops pour 100 nombres et &lt; 5500 ops pour 500 nombres. Ton algo actuel (mode adaptatif) ne passe pas ces seuils.</p>
+    </div>
+
+    <div class="card card-err">
+        <h3><span class="badge badge-fail">MANQUANT</span> README.md</h3>
+        <p>Le sujet exige un <code>README.md</code> a la racine du repo avec :</p>
+        <ul class="checklist">
+            <li><span class="badge badge-fail">ABSENT</span> Premiere ligne en italique : <em>"This project has been created as part of the 42 curriculum by &lt;login&gt;"</em></li>
+            <li><span class="badge badge-fail">ABSENT</span> Section <strong>"Description"</strong></li>
+            <li><span class="badge badge-fail">ABSENT</span> Section <strong>"Instructions"</strong> (compilation, execution)</li>
+            <li><span class="badge badge-fail">ABSENT</span> Section <strong>"Resources"</strong> + description de l'utilisation de l'IA</li>
+        </ul>
+    </div>
+
+    <!-- ===================== OPERATIONS ===================== -->
+    <h2>Les 11 operations</h2>
+
+    <div class="grid">
+        <div class="card card-info">
+            <h3>Swap</h3>
+            <table>
+                <tr><td><code>sa</code></td><td>Swap les 2 premiers de <strong>a</strong></td></tr>
+                <tr><td><code>sb</code></td><td>Swap les 2 premiers de <strong>b</strong></td></tr>
+                <tr><td><code>ss</code></td><td><code>sa</code> + <code>sb</code> en meme temps</td></tr>
+            </table>
+        </div>
+        <div class="card card-info">
+            <h3>Push</h3>
+            <table>
+                <tr><td><code>pa</code></td><td>Premier de <strong>b</strong> vers le haut de <strong>a</strong></td></tr>
+                <tr><td><code>pb</code></td><td>Premier de <strong>a</strong> vers le haut de <strong>b</strong></td></tr>
+            </table>
+        </div>
+        <div class="card card-info">
+            <h3>Rotate</h3>
+            <table>
+                <tr><td><code>ra</code></td><td>Decale <strong>a</strong> vers le haut (premier devient dernier)</td></tr>
+                <tr><td><code>rb</code></td><td>Decale <strong>b</strong> vers le haut</td></tr>
+                <tr><td><code>rr</code></td><td><code>ra</code> + <code>rb</code> en meme temps</td></tr>
+            </table>
+        </div>
+        <div class="card card-info">
+            <h3>Reverse Rotate</h3>
+            <table>
+                <tr><td><code>rra</code></td><td>Decale <strong>a</strong> vers le bas (dernier devient premier)</td></tr>
+                <tr><td><code>rrb</code></td><td>Decale <strong>b</strong> vers le bas</td></tr>
+                <tr><td><code>rrr</code></td><td><code>rra</code> + <code>rrb</code> en meme temps</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===================== ALGORITHMES ===================== -->
+    <h2>Les algorithmes et quand les utiliser</h2>
+
+    <div class="flowchart">
+        <h3 style="color:#58a6ff; margin-bottom:15px;">Decision du mode ADAPTIVE (ton code actuel)</h3>
+        <div class="flow-row">
+            <div class="flow-step decision">lena entre 2 et 5 ?</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step" style="border-color:#3fb950;">Small Sorters (hardcode)</div>
+        </div>
+        <div class="flow-row">
+            <div class="flow-step decision">disorder &ge; 50% ?</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step" style="border-color:#f85149;">Radix Sort (Complex)</div>
+        </div>
+        <div class="flow-row">
+            <div class="flow-step decision">20% &le; disorder &lt; 50% ?</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step" style="border-color:#d29922;">Chunk Sort (Medium)</div>
+        </div>
+        <div class="flow-row">
+            <div class="flow-step decision">disorder &lt; 20% ?</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-step" style="border-color:#58a6ff;">Selection Sort (Simple)</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="algo-box">
+            <div class="algo-name">Small Sorters</div>
+            <p class="complexity">O(1) - Hardcode</p>
+            <h3>Quand ?</h3>
+            <p>2 a 5 elements.</p>
+            <h3>Comment ?</h3>
+            <ul>
+                <li><strong>2 elem :</strong> un seul <code>sa</code> si pas trie</li>
+                <li><strong>3 elem :</strong> <code>ft_threefast</code> - toutes les permutations de 3 elements (max 2 ops)</li>
+                <li><strong>4-5 elem :</strong> <code>ft_fivast</code> - push les plus petits vers b, trie les 3 restants, puis pa</li>
+            </ul>
+            <h3>Performance</h3>
+            <p>3 elem : max 2 ops | 5 elem : max ~12 ops</p>
+        </div>
+
+        <div class="algo-box">
+            <div class="algo-name">Turk Sort (mode --simple)</div>
+            <p class="complexity">O(n^2) - Cost-based</p>
+            <h3>Quand ?</h3>
+            <p>Mode <code>--simple</code>. Meilleur algo pour les listes moyennes/grandes. <strong>C'est l'algo qui devrait etre utilise par defaut pour atteindre les benchmarks du sujet.</strong></p>
+            <h3>Comment ?</h3>
+            <ol>
+                <li>Push 2 elements dans b</li>
+                <li>Pour chaque element de a, calcule le cout pour le placer dans b a sa position correcte</li>
+                <li>Optimise avec <code>rr</code>/<code>rrr</code> quand les rotations vont dans le meme sens</li>
+                <li>Push le moins couteux</li>
+                <li>Trie les 3 restants dans a avec <code>ft_threefast</code></li>
+                <li>Push tout de b vers a a la bonne position</li>
+                <li>Rotation finale pour mettre le min en haut</li>
+            </ol>
+            <h3>Performance attendue</h3>
+            <p>100 elem : ~550-650 ops | 500 elem : ~4500-5500 ops</p>
+        </div>
+
+        <div class="algo-box">
+            <div class="algo-name">Selection Sort (Simple)</div>
+            <p class="complexity">O(n^2)</p>
+            <h3>Quand ?</h3>
+            <p>Disorder &lt; 20% (mode adaptatif). Liste presque triee.</p>
+            <h3>Comment ?</h3>
+            <ol>
+                <li>Trouve l'index du minimum dans a</li>
+                <li>Le rotate vers le haut (ra ou rra selon la position)</li>
+                <li>Push vers b</li>
+                <li>Repete jusqu'a ce que a soit vide</li>
+                <li>Push tout de b vers a</li>
+            </ol>
+            <h3>Performance</h3>
+            <p>Tres bon sur listes presque triees, mais O(n^2) sur listes desordonnees. ~2000+ ops pour 100 elem en general.</p>
+        </div>
+
+        <div class="algo-box">
+            <div class="algo-name">Chunk Sort (Medium)</div>
+            <p class="complexity">O(n * sqrt(n))</p>
+            <h3>Quand ?</h3>
+            <p>20% &le; disorder &lt; 50% (mode adaptatif).</p>
+            <h3>Comment ?</h3>
+            <ol>
+                <li>Copie la stack dans un tableau trie</li>
+                <li>Divise en chunks (taille adaptee selon n)</li>
+                <li>Push chaque chunk de a vers b</li>
+                <li>Reconstruit a en prenant toujours le max de b</li>
+            </ol>
+            <h3>Performance</h3>
+            <p>100 elem : ~800-1200 ops | 500 elem : ~6000-9000 ops selon la taille des chunks.</p>
+        </div>
+
+        <div class="algo-box">
+            <div class="algo-name">Radix Sort (Complex)</div>
+            <p class="complexity">O(n * log n)</p>
+            <h3>Quand ?</h3>
+            <p>Disorder &ge; 50% (mode adaptatif). Liste tres desordonnee.</p>
+            <h3>Comment ?</h3>
+            <ol>
+                <li>Copie la stack dans un tableau trie pour obtenir les index</li>
+                <li>Pour chaque bit (du LSB au MSB) :</li>
+                <li style="list-style:none; padding-left:20px;">- Si le bit de l'index est 1 : <code>ra</code></li>
+                <li style="list-style:none; padding-left:20px;">- Si le bit est 0 : <code>pb</code></li>
+                <li>Push tout de b vers a apres chaque passe de bit</li>
+            </ol>
+            <h3>Performance</h3>
+            <p>100 elem : ~1200-1600 ops | 500 elem : ~5500-8000 ops. Regulier mais pas optimal pour les benchmarks du sujet.</p>
+        </div>
+
+        <div class="algo-box" style="border: 2px solid #3fb950;">
+            <div class="algo-name" style="color:#3fb950;">Recommandation pour le sujet</div>
+            <p class="complexity">Pour atteindre 100%</p>
+            <h3>Strategie optimale</h3>
+            <ul>
+                <li><strong>2-5 elements :</strong> Small Sorters (hardcode) - deja en place</li>
+                <li><strong>6+ elements :</strong> <strong>Turk Sort</strong> dans tous les cas</li>
+            </ul>
+            <h3>Pourquoi ?</h3>
+            <p>Le Turk Sort est le seul algo de ton projet capable d'atteindre :</p>
+            <ul>
+                <li>&lt; 700 ops pour 100 nombres</li>
+                <li>&lt; 5500 ops pour 500 nombres</li>
+            </ul>
+            <p style="margin-top:10px;">Le mode adaptatif actuel utilise radix/chunk/selection qui sont tous trop lents pour les benchmarks 100%.</p>
+        </div>
+    </div>
+
+    <!-- ===================== BENCHMARKS ===================== -->
+    <h2>Benchmarks du sujet</h2>
+
+    <div class="card card-info">
+        <h3>Seuils pour la validation</h3>
+
+        <h3 style="color:#3fb950; margin-top:15px;">100% (necessaire pour les bonus)</h3>
+        <div class="benchmark-label"><span>100 nombres</span><span>&lt; 700 operations</span></div>
+        <div class="benchmark-bar" style="background:#21262d;">
+            <div class="benchmark-fill" style="width:100%; background: linear-gradient(90deg, #238636, #3fb950);">700 max</div>
+        </div>
+        <div class="benchmark-label"><span>500 nombres</span><span>&lt; 5500 operations</span></div>
+        <div class="benchmark-bar" style="background:#21262d;">
+            <div class="benchmark-fill" style="width:100%; background: linear-gradient(90deg, #238636, #3fb950);">5500 max</div>
+        </div>
+
+        <h3 style="color:#d29922; margin-top:20px;">Validation minimale (80%+)</h3>
+        <table>
+            <tr><th>Palier</th><th>100 nombres</th><th>500 nombres</th></tr>
+            <tr><td>Palier haut</td><td>&lt; 700</td><td>&lt; 5500</td></tr>
+            <tr><td>Palier moyen</td><td>&lt; 1100</td><td>&lt; 8500</td></tr>
+            <tr><td>Palier bas</td><td>&lt; 1300</td><td>&lt; 11500</td></tr>
+        </table>
+    </div>
+
+    <div class="summary-box">
+        <h3 style="color:#f0883e; margin-bottom:10px;">Comparaison de tes algos vs les seuils</h3>
+        <table>
+            <tr>
+                <th>Algorithme</th>
+                <th>100 elem (estimation)</th>
+                <th>500 elem (estimation)</th>
+                <th>Passe 100% ?</th>
+            </tr>
+            <tr>
+                <td>Small Sorters</td>
+                <td>N/A (2-5 seulement)</td>
+                <td>N/A</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>Turk Sort</td>
+                <td style="color:#3fb950;">~550-650</td>
+                <td style="color:#3fb950;">~4500-5500</td>
+                <td><span class="badge badge-ok">OUI</span></td>
+            </tr>
+            <tr>
+                <td>Selection Sort</td>
+                <td style="color:#f85149;">~2000+</td>
+                <td style="color:#f85149;">~50000+</td>
+                <td><span class="badge badge-fail">NON</span></td>
+            </tr>
+            <tr>
+                <td>Chunk Sort</td>
+                <td style="color:#d29922;">~800-1200</td>
+                <td style="color:#d29922;">~6000-9000</td>
+                <td><span class="badge badge-fail">NON</span></td>
+            </tr>
+            <tr>
+                <td>Radix Sort</td>
+                <td style="color:#f85149;">~1200-1600</td>
+                <td style="color:#d29922;">~5500-8000</td>
+                <td><span class="badge badge-fail">NON</span></td>
+            </tr>
+            <tr style="background:#0f1a0f;">
+                <td><strong>Adaptatif (actuel)</strong></td>
+                <td style="color:#f85149;"><strong>~1484</strong></td>
+                <td style="color:#d29922;"><strong>~7791</strong></td>
+                <td><span class="badge badge-fail">NON</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ===================== TODO ===================== -->
+    <h2>Ce qu'il reste a faire</h2>
+
+    <div class="card card-err">
+        <h3>Actions requises</h3>
+        <ul class="checklist">
+            <li><span class="badge badge-fail">CRITIQUE</span> <strong>Utiliser Turk Sort par defaut</strong> pour 6+ elements dans le mode adaptatif, au lieu de radix/chunk/selection. C'est le seul moyen d'atteindre les benchmarks 100%.</li>
+            <li><span class="badge badge-fail">MANQUANT</span> <strong>Creer un README.md</strong> avec : description, instructions, resources, mention de l'IA</li>
+            <li><span class="badge badge-warn">OPTIONNEL</span> Nettoyer les fichiers .o et le binaire du repo git (ajouter un <code>.gitignore</code>)</li>
+            <li><span class="badge badge-warn">OPTIONNEL</span> Retirer les flags custom (<code>--simple</code>, <code>--bench</code>, etc.) avant la soumission car le sujet ne les demande pas</li>
+        </ul>
+    </div>
+
+    <div class="card card-info">
+        <h3>Modification suggeree pour le mode adaptatif</h3>
+        <pre><code>void  adaptative_mode(t_sta *tab)
+{
+    if (tab->lena >= 2 && tab->lena <= 5)
+        small_sorters(tab);
+    else
+        ft_turksort(tab);
+}</code></pre>
+        <p style="margin-top:10px; color:#8b949e;">Simple, efficace, et suffisant pour tous les benchmarks du sujet.</p>
+    </div>
+
+</div>
+</body>
+</html>

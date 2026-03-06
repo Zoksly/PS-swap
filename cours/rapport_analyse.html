@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyse Push-Swap - Rapport Complet</title>
+<style>
+  :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --red: #f85149; --green: #3fb950; --orange: #d29922; --purple: #bc8cff; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', -apple-system, sans-serif; padding: 2rem; line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { color: var(--accent); font-size: 2rem; margin-bottom: 0.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+  h2 { color: var(--purple); font-size: 1.4rem; margin: 2rem 0 1rem; padding-left: 0.5rem; border-left: 4px solid var(--purple); }
+  h3 { color: var(--orange); font-size: 1.1rem; margin: 1.2rem 0 0.5rem; }
+  .subtitle { color: #8b949e; margin-bottom: 2rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; margin-bottom: 1rem; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; margin-right: 6px; }
+  .critical { background: #f8514920; color: var(--red); border: 1px solid var(--red); }
+  .major { background: #d2992220; color: var(--orange); border: 1px solid var(--orange); }
+  .minor { background: #3fb95020; color: var(--green); border: 1px solid var(--green); }
+  .norm { background: #bc8cff20; color: var(--purple); border: 1px solid var(--purple); }
+  .perf { background: #58a6ff20; color: var(--accent); border: 1px solid var(--accent); }
+  code { background: #1f2937; padding: 2px 6px; border-radius: 4px; font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.9em; color: #e6edf3; }
+  pre { background: #1f2937; padding: 1rem; border-radius: 6px; overflow-x: auto; margin: 0.5rem 0; font-size: 0.85em; line-height: 1.5; border: 1px solid var(--border); }
+  pre code { padding: 0; background: none; }
+  .file { color: var(--accent); font-weight: 500; }
+  .line { color: var(--orange); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th, td { padding: 0.6rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--accent); font-weight: 600; background: #1f2937; }
+  tr:hover { background: #1f293740; }
+  .score-box { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+  .score-item { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; text-align: center; flex: 1; min-width: 150px; }
+  .score-num { font-size: 2rem; font-weight: 700; }
+  .score-label { font-size: 0.85rem; color: #8b949e; }
+  .fail { color: var(--red); }
+  .pass { color: var(--green); }
+  .warn { color: var(--orange); }
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 700px) { .summary-grid { grid-template-columns: 1fr; } body { padding: 1rem; } }
+  .test-result { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+  .test-result:last-child { border: none; }
+  .check { color: var(--green); } .cross { color: var(--red); }
+  details { margin: 0.5rem 0; }
+  summary { cursor: pointer; color: var(--accent); font-weight: 500; }
+  summary:hover { text-decoration: underline; }
+  .toc { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 2rem; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc ol { padding-left: 1.5rem; }
+  .toc li { margin: 0.3rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Analyse Push-Swap &mdash; Rapport Complet</h1>
+<p class="subtitle">Projet : PS-swap | Auteur : vblanco- | Date d'analyse : 05/03/2026</p>
+
+<!-- SCORES -->
+<div class="score-box">
+  <div class="score-item"><div class="score-num fail">7</div><div class="score-label">Bugs critiques</div></div>
+  <div class="score-item"><div class="score-num warn">14</div><div class="score-label">Violations norme</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--purple)">5</div><div class="score-label">Code mort</div></div>
+  <div class="score-item"><div class="score-num" style="color:var(--accent)">5</div><div class="score-label">Optimisations</div></div>
+  <div class="score-item"><div class="score-num fail">4/34</div><div class="score-label">Tests &eacute;chou&eacute;s</div></div>
+</div>
+
+<!-- TABLE DES MATIERES -->
+<div class="toc">
+  <strong>Table des mati&egrave;res</strong>
+  <ol>
+    <li><a href="#tests">R&eacute;sultats des tests</a></li>
+    <li><a href="#critical">Bugs critiques (empechent le bon fonctionnement)</a></li>
+    <li><a href="#norm">Violations de la norme 42</a></li>
+    <li><a href="#dead">Code mort &amp; d&eacute;clarations orphelines</a></li>
+    <li><a href="#perf">Performance &amp; optimisations</a></li>
+    <li><a href="#misc">Probl&egrave;mes divers</a></li>
+    <li><a href="#filemap">R&eacute;sum&eacute; par fichier</a></li>
+  </ol>
+</div>
+
+<!-- =========================================================== -->
+<h2 id="tests">1. R&eacute;sultats des tests</h2>
+
+<div class="card">
+<h3>Tests d'erreurs (doit afficher "Error")</h3>
+<div class="test-result"><span>1. Aucun argument (silence)</span><span class="check">&#10004; OK</span></div>
+<div class="test-result"><span>2. Chaine vide <code>""</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>3. Espace seul <code>" "</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>4. Non num&eacute;rique <code>"1 a 2"</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>5. Doublon <code>"1 2 2"</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>6. Doublon lointain <code>"5 1 2 3 5"</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>7. Overflow <code>2147483648</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>8. Underflow <code>-2147483649</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>9. Max Long <code>999999999999</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>10. Signe <code>-</code> seul</span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>11. Signe <code>+</code> seul</span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>12. Format <code>1-2</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>13. Double signe <code>--1</code></span><span class="check">&#10004; Error</span></div>
+<div class="test-result"><span>14. Texte coll&eacute; <code>123a</code></span><span class="check">&#10004; Error</span></div>
+</div>
+
+<div class="card">
+<h3>Tests d&eacute;j&agrave; tri&eacute;s (doit &ecirc;tre silencieux)</h3>
+<div class="test-result"><span>16. Un seul nombre <code>42</code></span><span class="check">&#10004; Silence</span></div>
+<div class="test-result"><span>17. Deux nombres tri&eacute;s <code>1 2</code></span><span class="cross">&#10008; Sortie : <code>sa</code> (swap inutile !)</span></div>
+<div class="test-result"><span>18. Trois nombres tri&eacute;s <code>1 2 3</code></span><span class="check">&#10004; Silence</span></div>
+<div class="test-result"><span>19. Cinq nombres tri&eacute;s (string) <code>"1 2 3 4 5"</code></span><span class="cross">&#10008; Sortie : 4 ops (pb pb pa pa)</span></div>
+<div class="test-result"><span>20. 10 nombres tri&eacute;s avec n&eacute;gatifs <code>-5 .. 4</code></span><span class="cross">&#10008; Sortie : 46 ops !</span></div>
+</div>
+
+<div class="card">
+<h3>Petits tris (3 &amp; 5 nombres)</h3>
+<table>
+<tr><th>Input</th><th>Ops</th><th>Limite</th><th>Status</th></tr>
+<tr><td><code>1 3 2</code></td><td>2</td><td>&le; 3</td><td class="pass">&#10004;</td></tr>
+<tr><td><code>2 1 3</code></td><td>1</td><td>&le; 3</td><td class="pass">&#10004;</td></tr>
+<tr><td><code>3 2 1</code></td><td>2</td><td>&le; 3</td><td class="pass">&#10004;</td></tr>
+<tr><td><code>5 4 3 2 1</code></td><td>8</td><td>&le; 12</td><td class="pass">&#10004;</td></tr>
+<tr><td><code>3 5 1 4 2</code></td><td>10</td><td>&le; 12</td><td class="pass">&#10004;</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>Benchmarks (100 &amp; 500 nombres)</h3>
+<table>
+<tr><th>Test</th><th>Mode</th><th>Ops</th><th>Cible</th><th>Tri&eacute;?</th><th>Status</th></tr>
+<tr><td>100 random</td><td>Adaptive (radix)</td><td>700-1700</td><td>&lt; 700</td><td class="pass">Oui</td><td class="fail">&#10008; Trop variable</td></tr>
+<tr><td>100 random</td><td>--simple (Turk)</td><td>~560</td><td>&lt; 700</td><td class="pass">Oui</td><td class="pass">&#10004;</td></tr>
+<tr><td>100 invers&eacute;</td><td>Adaptive</td><td>1084</td><td>&lt; 700</td><td class="pass">Oui</td><td class="fail">&#10008;</td></tr>
+<tr><td>500 random</td><td>Adaptive (radix)</td><td>7500-11800</td><td>&lt; 5500</td><td class="pass">Oui</td><td class="fail">&#10008; x2 trop</td></tr>
+<tr><td>500 random</td><td>--simple (Turk)</td><td>~4900</td><td>&lt; 5500</td><td class="pass">Oui</td><td class="pass">&#10004;</td></tr>
+<tr><td>500 invers&eacute;</td><td>Adaptive</td><td>6784</td><td>&lt; 5500</td><td class="pass">Oui</td><td class="fail">&#10008;</td></tr>
+</table>
+<p style="color:#8b949e; margin-top:0.5rem;"><strong>Conclusion :</strong> Le Turk sort (<code>--simple</code>) passe les limites. Le mode Adaptive utilise radix qui est trop co&ucirc;teux.</p>
+</div>
+
+<div class="card">
+<h3>Valgrind &mdash; Fuites m&eacute;moire</h3>
+<table>
+<tr><th>Test</th><th>Fuite</th><th>Status</th></tr>
+<tr><td><code>5 4 3 2 1</code></td><td>80 bytes (16 direct + 64 indirect)</td><td class="fail">&#10008; LEAK</td></tr>
+<tr><td><code>"5 4 3 2 1"</code> (ft_split)</td><td>80 bytes</td><td class="fail">&#10008; LEAK</td></tr>
+<tr><td><code>--simple 5 4 3 2 1</code></td><td>80 bytes</td><td class="fail">&#10008; LEAK</td></tr>
+<tr><td><code>--bench 5 4 3 2 1</code></td><td>80 bytes</td><td class="fail">&#10008; LEAK</td></tr>
+</table>
+<p style="color:#8b949e; margin-top:0.5rem;">Cause : <code>ft_lstclear(&stack, NULL)</code> &mdash; l'impl&eacute;mentation de libft a <code>if (lst && del)</code>, donc <code>del=NULL</code> &rArr; rien n'est lib&eacute;r&eacute;.</p>
+</div>
+
+<!-- =========================================================== -->
+<h2 id="critical">2. Bugs critiques</h2>
+
+<div class="card">
+<span class="badge critical">CRITIQUE</span> <strong>BUG #1 &mdash; Pas de v&eacute;rification "d&eacute;j&agrave; tri&eacute;"</strong>
+<p><span class="file">main.c</span>:<span class="line">122-123</span></p>
+<p>Apr&egrave;s calcul du disorder, <code>ft_choose_algo</code> est appel&eacute; m&ecirc;me si la liste est d&eacute;j&agrave; tri&eacute;e. Aucun <code>if (is_sorted_stack(...))</code> ni <code>if (disorder == 0) return</code>.</p>
+<pre><code>tab -> disorder = ft_compute_disorder(tab, tab -> lena);
+// MANQUE : if (is_sorted_stack(tab->stack_a)) { ft_free(args, tab); return 0; }
+ft_choose_algo(tab);</code></pre>
+<p><strong>Cons&eacute;quence :</strong> <code>./push_swap 1 2</code> affiche <code>sa</code> (swap la liste d&eacute;j&agrave; tri&eacute;e &rarr; r&eacute;sultat FAUX).</p>
+</div>
+
+<div class="card">
+<span class="badge critical">CRITIQUE</span> <strong>BUG #2 &mdash; <code>small_sorters</code> swap inconditionnel pour 2 nombres</strong>
+<p><span class="file">Algos/small_sorters.c</span>:<span class="line">21-22</span></p>
+<pre><code>else if ((int)tab -> lena == 2)
+    sa(tab, &tab -> stack_a);  // TOUJOURS swap, meme si deja trie !</code></pre>
+<p><strong>Fix :</strong> Ajouter <code>if (!is_sorted_stack(tab->stack_a))</code> avant le <code>sa</code>.</p>
+</div>
+
+<div class="card">
+<span class="badge critical">CRITIQUE</span> <strong>BUG #3 &mdash; Comparaison <code>void*</code> au lieu de <code>(long)</code> dans <code>ft_compute_disorder</code></strong>
+<p><span class="file">main.c</span>:<span class="line">31-34</span></p>
+<pre><code>if ((current -> content) > next -> content)      // void* comparison !
+    miss++;
+else if ((current -> content) < next -> content)  // void* comparison !
+    succ++;</code></pre>
+<p>Les nombres n&eacute;gatifs sont stock&eacute;s comme <code>(void*)(long)(-5)</code> = <code>0xFFFF...FFFB</code>. En comparaison non-sign&eacute;e, <code>-5 > 4</code> est VRAI.</p>
+<p><strong>Cons&eacute;quence :</strong> <code>-5 -4 -3 ... 4</code> (tri&eacute;) donne disorder &gt; 0 &rarr; 46 op&eacute;rations inutiles.</p>
+<p><strong>Fix :</strong> <code>if ((long)(current->content) > (long)(next->content))</code></p>
+</div>
+
+<div class="card">
+<span class="badge critical">CRITIQUE</span> <strong>BUG #4 &mdash; Fuite m&eacute;moire : <code>ft_lstclear</code> avec <code>del=NULL</code></strong>
+<p><span class="file">utils.c</span>:<span class="line">20-23</span> + <span class="file">libft/ft_lstclear.c</span></p>
+<pre><code>// utils.c
+ft_lstclear(&tab -> stack_a, NULL);  // del = NULL
+ft_lstclear(&tab -> stack_b, NULL);
+
+// libft/ft_lstclear.c
+void ft_lstclear(t_list **lst, void (*del)(void*))
+{
+    if (lst && del)  // &lt;-- del est NULL, donc RIEN n'est libere !
+    { ... }
+}</code></pre>
+<p><strong>Cons&eacute;quence :</strong> 80+ bytes de fuite &agrave; chaque ex&eacute;cution (tous les noeuds de la liste).</p>
+<p><strong>Fix :</strong> Soit modifier ft_lstclear, soit lib&eacute;rer manuellement dans ft_free :</p>
+<pre><code>t_list *tmp;
+while (tab->stack_a) {
+    tmp = tab->stack_a->next;
+    free(tab->stack_a);
+    tab->stack_a = tmp;
+}</code></pre>
+</div>
+
+<div class="card">
+<span class="badge critical">CRITIQUE</span> <strong>BUG #5 &mdash; <code>ft_dprintf</code> ne supporte pas <code>%f</code></strong>
+<p><span class="file">push_swap.c</span>:<span class="line">68</span></p>
+<pre><code>ft_dprintf(2, "[bench] Disorder : %.2f%%\n", (int)(disorder));</code></pre>
+<p>Probl&egrave;mes : (1) <code>ft_dprintf</code> n'impl&eacute;mente pas <code>%f</code>/<code>%.2f</code>, (2) cast en <code>(int)</code> avant passage &agrave; un format float.</p>
+<p><strong>Fix :</strong> Utiliser <code>ft_dprintf(2, "[bench] Disorder : %d%%\n", (int)(disorder));</code></p>
+</div>
+
+<div class="card">
+<span class="badge critical">CRITIQUE</span> <strong>BUG #6 &mdash; Lecture hors bornes dans <code>find_chunk_in_stack</code></strong>
+<p><span class="file">Algos/medium.c</span>:<span class="line">30</span></p>
+<pre><code>index = get_index(stack, sorted_array, tab->lena + tab->lenb);
+//                                      ^^^^^^^^^^^^^^^^^^^^
+// sorted_array est allou&eacute; avec taille tab->lena (ligne 70 de ft_medium)
+// mais on cherche sur tab->lena + tab->lenb elements !</code></pre>
+<p><strong>Cons&eacute;quence :</strong> Lecture hors du buffer allou&eacute; d&egrave;s que <code>lenb &gt; 0</code>. UB potentiel.</p>
+</div>
+
+<div class="card">
+<span class="badge critical">CRITIQUE</span> <strong>BUG #7 &mdash; Mode Adaptive utilise le radix (~11000 ops) au lieu du Turk (~5000 ops)</strong>
+<p><span class="file">push_swap.c</span>:<span class="line">15-25</span></p>
+<pre><code>void adaptative_mode(t_sta *tab)
+{
+    if (tab->lena >= 2 && tab->lena <= 5)
+        small_sorters(tab);
+    else if (tab->disorder >= 0.5)
+        radix_sort(tab);        // 7500-11800 ops pour 500 nombres !
+    else if (tab->disorder >= 0.2)
+        ft_medium(tab, ...);
+    else if (tab->disorder < 0.2)
+        ft_simple(tab);         // Selection sort O(n^2)
+}</code></pre>
+<p>Le mode par d&eacute;faut (ADAPTIVE) ne passe <strong>jamais</strong> les limites de la moulinette pour 100+ nombres. Le Turk sort (<code>--simple</code>) donne ~4900 ops pour 500 nombres.</p>
+</div>
+
+<!-- =========================================================== -->
+<h2 id="norm">3. Violations de la norme 42</h2>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong>14 commentaires <code>//</code> (interdit &mdash; utiliser <code>/* */</code>)</strong>
+<table>
+<tr><th>Fichier</th><th>Ligne</th><th>Commentaire</th></tr>
+<tr><td class="file">main.c</td><td>15</td><td><code>//Calcul of disorder</code></td></tr>
+<tr><td class="file">main.c</td><td>45</td><td><code>//Initialisation of stack...</code></td></tr>
+<tr><td class="file">main.c</td><td>71</td><td><code>//Parsing of mode(s)...</code></td></tr>
+<tr><td class="file">main.c</td><td>93</td><td><code>//Parsing if they are modes...</code></td></tr>
+<tr><td class="file">utils.c</td><td>33</td><td><code>//check if the stack is sorted</code></td></tr>
+<tr><td class="file">utils.c</td><td>45</td><td><code>//Check doubles in stack</code></td></tr>
+<tr><td class="file">push_swap.c</td><td>27</td><td><code>//Choice of algo...</code></td></tr>
+<tr><td class="file">push_swap.c</td><td>62</td><td><code>//Benchmark dashboard...</code></td></tr>
+<tr><td class="file">small_sorters.c</td><td>25</td><td><code>//Sorter for 4 and 5...</code></td></tr>
+<tr><td class="file">small_sorters.c</td><td>50</td><td><code>//Sorter for 3 numbers...</code></td></tr>
+<tr><td class="file">helpers.c</td><td>41</td><td><code>//sorting array</code></td></tr>
+<tr><td class="file">helpers.c</td><td>67</td><td><code>//copy stack to an array</code></td></tr>
+<tr><td class="file">medium.c</td><td>15</td><td><code>//search the first element...</code></td></tr>
+<tr><td class="file">medium.c</td><td>39</td><td><code>//push stack_a to tack_b...</code></td></tr>
+</table>
+</div>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong>3 fichiers sans header 42</strong>
+<table>
+<tr><th>Fichier</th><th>Premi&egrave;re ligne actuelle</th></tr>
+<tr><td class="file">Algos/Turk/turk.c</td><td><code>#include "../../Push_swap/push_swap.h"</code></td></tr>
+<tr><td class="file">Algos/Turk/costs.c</td><td><code>#include "../../Push_swap/push_swap.h"</code></td></tr>
+<tr><td class="file">Algos/Turk/helps.c</td><td><code>#include "../../Push_swap/push_swap.h"</code></td></tr>
+</table>
+</div>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong>Espaces au lieu de tabulations</strong>
+<p><span class="file">Algos/medium.c</span>:<span class="line">42-58</span> &mdash; Toute la fonction <code>push_chunk</code> est indent&eacute;e avec 4 espaces au lieu de tabs.</p>
+</div>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong>Lignes &gt; 80 caract&egrave;res</strong>
+<table>
+<tr><th>Fichier</th><th>Ligne</th><th>Longueur</th><th>Contenu</th></tr>
+<tr><td class="file">medium.c</td><td>16</td><td>81</td><td>Prototype <code>find_chunk_in_stack</code></td></tr>
+<tr><td class="file">medium.c</td><td>48</td><td>88</td><td><code>while ((n_index = find_chunk_in_stack(...))</code></td></tr>
+<tr><td class="file">Turk/turk.c</td><td>46</td><td>90</td><td><code>return (tab->c_ops.c_ra + ...)</code></td></tr>
+</table>
+</div>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong>Fonction &gt; 25 lignes</strong>
+<p><span class="file">main.c</span>:<span class="line">16-43</span> &mdash; <code>ft_compute_disorder</code> fait 28 lignes (max autoris&eacute; : 25).</p>
+</div>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong><code>#include &lt;stdio.h&gt;</code> interdit</strong>
+<p><span class="file">libft/libft.h</span>:<span class="line">16</span> &mdash; <code>stdio.h</code> n'est jamais utilis&eacute; et est interdit par la norme 42.</p>
+</div>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong>Include circulaire</strong>
+<p><span class="file">push_swap.h</span>:<span class="line">19</span> inclut <code>ft_dprintf.h</code><br>
+<span class="file">ft_dprintf.h</span>:<span class="line">16</span> inclut <code>push_swap.h</code></p>
+<p>Fonctionne gr&acirc;ce aux guards <code>#ifndef</code>, mais c'est une mauvaise pratique. <code>ft_dprintf.h</code> ne devrait pas inclure <code>push_swap.h</code>.</p>
+</div>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong>Prototype d&eacute;clar&eacute; avec le mauvais nom</strong>
+<p><span class="file">push_swap.h</span>:<span class="line">82</span> : <code>float compute_disorder(t_sta *tab, int i);</code></p>
+<p>L'impl&eacute;mentation est <code>ft_compute_disorder</code> (main.c:16). Le prototype ne correspond &agrave; aucune fonction.</p>
+</div>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong>Typedef : <code>c_ops</code> au lieu de <code>t_*</code></strong>
+<p><span class="file">push_swap.h</span>:<span class="line">53</span> : Le typedef est <code>c_ops</code> mais la convention 42 est <code>t_count_ops</code> ou similaire avec pr&eacute;fixe <code>t_</code>.</p>
+</div>
+
+<div class="card">
+<span class="badge norm">NORME</span> <strong>Magic numbers dans <code>get_benchmark</code></strong>
+<p><span class="file">push_swap.c</span>:<span class="line">69-76</span></p>
+<pre><code>if (tab -> mode == 1)       // devrait etre SIMPLE
+else if (tab -> mode == 2)  // devrait etre MEDIUM
+else if (tab -> mode == 3)  // devrait etre COMPLEX
+else if (tab -> mode == 0)  // devrait etre ADAPTIVE</code></pre>
+</div>
+
+<!-- =========================================================== -->
+<h2 id="dead">4. Code mort &amp; d&eacute;clarations orphelines</h2>
+
+<div class="card">
+<table>
+<tr><th>#</th><th>El&eacute;ment</th><th>Fichier</th><th>D&eacute;tail</th></tr>
+<tr><td>1</td><td><code>count_bits()</code></td><td class="file">complex.c:30-52</td><td>Fonction d&eacute;finie mais jamais appel&eacute;e nulle part</td></tr>
+<tr><td>2</td><td><code>int cost</code></td><td class="file">Turk/turk.c:76</td><td>Variable d&eacute;clar&eacute;e, utilis&eacute;e seulement comme compteur local mais <code>min_index</code> serait suffisant</td></tr>
+<tr><td>3</td><td><code>tra.best_index_a</code></td><td class="file">Turk/turk.c:55,64</td><td>Valu&eacute;e dans le tracking mais jamais lue ensuite</td></tr>
+<tr><td>4</td><td><code>ft_index_stack()</code></td><td class="file">push_swap.h:105</td><td>D&eacute;clar&eacute;e mais jamais d&eacute;finie ni appel&eacute;e</td></tr>
+<tr><td>5</td><td><code>compute_disorder()</code></td><td class="file">push_swap.h:82</td><td>Mauvais nom &mdash; l'impl&eacute;mentation est <code>ft_compute_disorder</code></td></tr>
+</table>
+</div>
+
+<!-- =========================================================== -->
+<h2 id="perf">5. Performance &amp; optimisations</h2>
+
+<div class="card">
+<span class="badge perf">PERF</span> <strong>Le mode Adaptive devrait utiliser Turk sort pour les grandes listes</strong>
+<p>Actuellement, pour disorder &ge; 0.5 (cas le plus fr&eacute;quent avec des donn&eacute;es al&eacute;atoires), le radix sort est utilis&eacute; :</p>
+<table>
+<tr><th>Algo</th><th>500 nombres (random)</th><th>500 nombres (invers&eacute;)</th><th>Objectif</th></tr>
+<tr><td>Radix (adaptive)</td><td class="fail">7500-11800</td><td class="fail">6784</td><td>&lt; 5500</td></tr>
+<tr><td>Turk (--simple)</td><td class="pass">~4900</td><td class="pass">~5100</td><td>&lt; 5500</td></tr>
+<tr><td>Medium (chunks)</td><td class="warn">~6000</td><td class="warn">~5800</td><td>&lt; 5500</td></tr>
+</table>
+<p><strong>Suggestion :</strong> Utiliser le Turk sort comme algo principal pour &ge; 6 nombres dans le mode adaptive.</p>
+</div>
+
+<div class="card">
+<span class="badge perf">PERF</span> <strong><code>sort_array</code> utilise bubble sort</strong>
+<p><span class="file">helpers.c</span>:<span class="line">42-65</span> &mdash; Tri &agrave; bulles O(n&sup2;). Pour 500 nombres, c'est lent. Un tri par insertion ou merge sort serait plus rapide. Impact mineur sur le nombre d'op&eacute;rations push_swap mais ralentit l'ex&eacute;cution.</p>
+</div>
+
+<div class="card">
+<span class="badge perf">PERF</span> <strong><code>ft_chunk_size</code> : trous dans les conditions</strong>
+<p><span class="file">helpers.c</span>:<span class="line">15-25</span></p>
+<pre><code>if (i > 20 && i < 150)     // i=20, i=150 non couverts
+else if (i > 150 && i < 300) // i=300 non couvert
+else if (i > 300)
+else return (i / 2);         // i=20 tombe ici</code></pre>
+<p>Les valeurs 20, 150, et 300 tombent dans le <code>else</code> (i/2). Utiliser <code>&gt;=</code> et <code>&lt;=</code>.</p>
+</div>
+
+<div class="card">
+<span class="badge perf">PERF</span> <strong><code>ft_simple</code> : selection sort O(n&sup2;) pour le mode adaptive faible disorder</strong>
+<p><span class="file">Algos/simple.c</span>:<span class="line">39-61</span> &mdash; Utilis&eacute; quand <code>disorder &lt; 0.2</code>. M&ecirc;me pour peu de d&eacute;sordre, c'est tr&egrave;s lent sur 500+ nombres. Le Turk sort serait meilleur dans tous les cas.</p>
+</div>
+
+<div class="card">
+<span class="badge perf">PERF</span> <strong><code>get_index</code> : recherche lin&eacute;aire dans le tableau tri&eacute;</strong>
+<p><span class="file">helpers.c</span>:<span class="line">27-39</span> &mdash; Recherche O(n) dans un tableau tri&eacute;. Une recherche binaire serait O(log n). Impact mineur.</p>
+</div>
+
+<!-- =========================================================== -->
+<h2 id="misc">6. Probl&egrave;mes divers</h2>
+
+<div class="card">
+<span class="badge major">ROBUSTESSE</span> <strong>Guard incomplet dans <code>ft_r</code> (op3.c)</strong>
+<p><span class="file">Operations/op3.c</span>:<span class="line">20</span></p>
+<pre><code>if (!(stack1) || !((*stack1)->next))
+//                 ^^^^^^^^^^^^^^^^ dereference *stack1 sans verifier si *stack1 est NULL</code></pre>
+<p>Si <code>*stack1 == NULL</code>, <code>(*stack1)->next</code> est un segfault. Devrait &ecirc;tre :</p>
+<pre><code>if (!(stack1) || !(*stack1) || !((*stack1)->next))</code></pre>
+<p><em>Note : op4.c a d&eacute;j&agrave; le guard correct.</em></p>
+</div>
+
+<div class="card">
+<span class="badge major">TYPE</span> <strong>Retour <code>0</code> au lieu de <code>NULL</code> pour <code>int*</code></strong>
+<p><span class="file">helpers.c</span>:<span class="line">75</span> : <code>return (0);</code> dans <code>stack_to_array</code> qui retourne <code>int *</code>. Devrait &ecirc;tre <code>return (NULL);</code></p>
+</div>
+
+<div class="card">
+<span class="badge major">TYPE</span> <strong>Troncature <code>long</code> &rarr; <code>int</code> dans <code>stack_to_array</code></strong>
+<p><span class="file">helpers.c</span>:<span class="line">79</span> : <code>array[i] = (long)stack->content;</code></p>
+<p>Le tableau est <code>int*</code> mais on y stocke un <code>long</code>. Pour des valeurs dans la plage INT, ca fonctionne, mais c'est un cast implicite dangereux.</p>
+</div>
+
+<div class="card">
+<span class="badge major">LOGIQUE</span> <strong><code>ft_dprintf</code> : <code>ft_strlen</code> d&eacute;clar&eacute;e en double</strong>
+<p><span class="file">ft_dprintf.h</span>:<span class="line">31</span> re-d&eacute;clare <code>ft_strlen</code> d&eacute;j&agrave; dans <code>libft.h</code>.</p>
+</div>
+
+<div class="card">
+<span class="badge minor">STYLE</span> <strong>Le fichier <code>small_sorters.c</code> a pour header <code>hardcodes.c</code></strong>
+<p><span class="file">Algos/small_sorters.c</span>:<span class="line">4</span> : Le header 42 dit <code>hardcodes.c</code> mais le fichier est <code>small_sorters.c</code>.</p>
+</div>
+
+<!-- =========================================================== -->
+<h2 id="filemap">7. R&eacute;sum&eacute; par fichier</h2>
+
+<div class="card">
+<table>
+<tr><th>Fichier</th><th>Probl&egrave;mes</th></tr>
+<tr><td class="file">Push_swap/main.c</td><td>
+  <span class="badge critical">BUG</span> Pas de check sorted avant algo<br>
+  <span class="badge critical">BUG</span> void* comparison dans disorder<br>
+  <span class="badge norm">NORME</span> 4&times; commentaires //<br>
+  <span class="badge norm">NORME</span> Fonction &gt;25 lignes (28)
+</td></tr>
+<tr><td class="file">Push_swap/push_swap.c</td><td>
+  <span class="badge critical">BUG</span> Mode adaptive trop lent<br>
+  <span class="badge critical">BUG</span> %.2f non support&eacute; par ft_dprintf<br>
+  <span class="badge norm">NORME</span> 2&times; commentaires //<br>
+  <span class="badge norm">NORME</span> Magic numbers (0,1,2,3)
+</td></tr>
+<tr><td class="file">Push_swap/push_swap.h</td><td>
+  <span class="badge norm">NORME</span> Prototype orphelin compute_disorder<br>
+  <span class="badge norm">NORME</span> Prototype orphelin ft_index_stack<br>
+  <span class="badge norm">NORME</span> Typedef c_ops sans pr&eacute;fixe t_<br>
+  <span class="badge norm">NORME</span> Include circulaire via ft_dprintf.h
+</td></tr>
+<tr><td class="file">Push_swap/utils.c</td><td>
+  <span class="badge critical">BUG</span> ft_lstclear(NULL) = fuite<br>
+  <span class="badge norm">NORME</span> 2&times; commentaires //
+</td></tr>
+<tr><td class="file">Operations/op3.c</td><td>
+  <span class="badge major">BUG</span> Guard incomplet dans ft_r
+</td></tr>
+<tr><td class="file">Operations/op4.c</td><td>
+  <span class="badge minor">OK</span> Guard correct (fix&eacute;)
+</td></tr>
+<tr><td class="file">Algos/simple.c</td><td>
+  <span class="badge perf">PERF</span> Selection sort O(n&sup2;)
+</td></tr>
+<tr><td class="file">Algos/medium.c</td><td>
+  <span class="badge critical">BUG</span> Lecture hors bornes (lena+lenb)<br>
+  <span class="badge norm">NORME</span> 2&times; commentaires //<br>
+  <span class="badge norm">NORME</span> Espaces au lieu de tabs<br>
+  <span class="badge norm">NORME</span> 2 lignes &gt;80 caract&egrave;res
+</td></tr>
+<tr><td class="file">Algos/complex.c</td><td>
+  <span class="badge minor">DEAD</span> count_bits() jamais appel&eacute;e
+</td></tr>
+<tr><td class="file">Algos/helpers.c</td><td>
+  <span class="badge norm">NORME</span> 2&times; commentaires //<br>
+  <span class="badge major">TYPE</span> return 0 au lieu de NULL<br>
+  <span class="badge major">TYPE</span> long &rarr; int troncature<br>
+  <span class="badge perf">PERF</span> Bubble sort + recherche lin&eacute;aire
+</td></tr>
+<tr><td class="file">Algos/small_sorters.c</td><td>
+  <span class="badge critical">BUG</span> sa() inconditionnel pour lena==2<br>
+  <span class="badge norm">NORME</span> 2&times; commentaires //<br>
+  <span class="badge minor">STYLE</span> Mauvais nom dans header 42
+</td></tr>
+<tr><td class="file">Algos/Turk/turk.c</td><td>
+  <span class="badge norm">NORME</span> Pas de header 42<br>
+  <span class="badge norm">NORME</span> 1 ligne &gt;80 chars<br>
+  <span class="badge minor">DEAD</span> Variable cost inutilis&eacute;e<br>
+  <span class="badge minor">DEAD</span> best_index_a jamais lu
+</td></tr>
+<tr><td class="file">Algos/Turk/costs.c</td><td>
+  <span class="badge norm">NORME</span> Pas de header 42
+</td></tr>
+<tr><td class="file">Algos/Turk/helps.c</td><td>
+  <span class="badge norm">NORME</span> Pas de header 42
+</td></tr>
+<tr><td class="file">libft/libft.h</td><td>
+  <span class="badge norm">NORME</span> #include &lt;stdio.h&gt; interdit
+</td></tr>
+<tr><td class="file">ft_dprintf/ft_dprintf.h</td><td>
+  <span class="badge norm">NORME</span> Include circulaire vers push_swap.h<br>
+  <span class="badge minor">DUP</span> Re-d&eacute;claration ft_strlen
+</td></tr>
+</table>
+</div>
+
+<!-- FOOTER -->
+<div style="margin-top:3rem; padding-top:1rem; border-top:1px solid var(--border); color:#8b949e; text-align:center;">
+  <p>Rapport g&eacute;n&eacute;r&eacute; automatiquement &mdash; 05/03/2026<br>
+  <strong>Priorit&eacute; #1 :</strong> Corriger BUG #1 (check sorted), #2 (sa inconditionnel), #3 (void* cast), #4 (leak).<br>
+  <strong>Priorit&eacute; #2 :</strong> Utiliser Turk sort en mode adaptive pour passer sous 5500 ops.<br>
+  <strong>Priorit&eacute; #3 :</strong> Corriger toutes les violations norme avant soumission.</p>
+</div>
+
+</div>
+</body>
+</html>

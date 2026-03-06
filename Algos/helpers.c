@@ -15,7 +15,7 @@
 int	ft_chunk_size(int i)
 {
 	if (i > 20 && i < 150)
-		return (i / 6);
+		return (i / 10);
 	else if (i > 150 && i < 300)
 		return (i / 15);
 	else if (i > 300)

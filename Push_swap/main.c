@@ -28,9 +28,9 @@ float	ft_compute_disorder(t_sta *tab, int nb_node)
 		next = current -> next;
 		while (next)
 		{
-			if ((current -> content) > next -> content)
+			if ((long)(current -> content) > (long)next -> content)
 				miss++;
-			else if ((current -> content) < next -> content)
+			else if ((long)(current -> content) < (long)next -> content)
 				succ++;
 			next = next -> next;
 		}
@@ -113,13 +113,15 @@ int	main(int argc, char **argv)
 
 	if (argc < 2)
 		return (0);
-	tab = calloc(1, sizeof(t_sta));
+	tab = ft_calloc(1, sizeof(t_sta));
 	if (!tab)
-		return (0);
+		return (ft_putstr_fd("Error\n", 2), 0);
 	args = ft_init(argv, argc, tab);
 	if (!args)
 		return (0);
 	tab -> disorder = ft_compute_disorder(tab, tab -> lena);
+	if (tab -> disorder == 0)
+		return (ft_free(args, tab), 0);
 	ft_choose_algo(tab);
 	ft_free(args, tab);
 	return (0);
